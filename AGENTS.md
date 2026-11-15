@@ -1,121 +1,295 @@
 
-## Mandatory SmartIAM Screenshot Visual Fidelity Rules
+# SmartIAM Admin Boilerplate — Master Engineering Rules
 
-### 1. Design Source of Truth
-Approved SmartIAM screenshots are the authoritative
-visual references for frontend implementation.
+## 1. Project Objective
 
-Codex MUST inspect the relevant screenshot before
-implementing or modifying any screen.
+Develop a production-oriented, reusable enterprise
+administration frontend template.
 
-The implementation MUST preserve:
-- Page background colors
-- Header and sidebar background colors
-- Content area and card background colors
-- Primary, secondary, and accent colors
-- Text colors and typography
-- Button colors, sizes, shapes, and positions
-- Grid header, row, border, and selection colors
-- Form control backgrounds and borders
-- Status indicators and badges
-- Icons, sizes, and alignment
-- Padding, margins, gaps, and whitespace
-- Border radius, shadows, and separators
-- Navigation expansion and active menu styles
-- Modal, toast, wizard, and drawer appearance
+The template will initially support SmartIAM and must
+be reusable for other enterprise applications.
 
-### 2. Color Extraction
-Do NOT invent or arbitrarily choose colors.
+The application must provide:
+- Authentication and session management
+- Enterprise administration layout
+- Collapsible and expandable navigation
+- Reusable UI component library
+- Data grids and exports
+- Notifications and dialogs
+- Dashboards
+- Forms and wizards
+- Profile management
+- Permission-aware UI
+- Responsive and accessible design
 
-Extract the design colors from approved screenshots.
+This is a working application foundation,
+not a static UI demonstration.
 
-Create semantic CSS variables:
+## 2. Technology Stack
 
---iam-bg-page
---iam-bg-sidebar
---iam-bg-header
---iam-bg-card
---iam-bg-input
---iam-bg-hover
---iam-bg-selected
---iam-color-primary
---iam-color-secondary
---iam-color-accent
---iam-text-primary
---iam-text-secondary
---iam-border-default
---iam-border-focus
---iam-status-success
---iam-status-warning
---iam-status-error
---iam-status-info
+Frontend:
+- Angular 20
+- Standalone components
+- Zoneless change detection
+- TypeScript strict mode
+- Angular Signals
+- Typed Reactive Forms
+- Tailwind CSS v4
+- AG Grid Community
+- Lucide Angular icons
+- ExcelJS for XLSX exports
+- Playwright for end-to-end and visual testing
 
-Use the extracted values consistently across the app.
+Future backend integration:
+- ASP.NET Core 10 Minimal API
+- YARP API Gateway
+- SQL Server / PostgreSQL
 
-When a screenshot color cannot be determined reliably,
-mark the value as provisional and document it.
+Do not introduce additional major dependencies
+without documenting their necessity.
 
-### 3. Layout Fidelity
-Match screenshot geometry:
-- Sidebar width and collapsed width
-- Header height
-- Content maximum width
-- Page margins and padding
-- Grid column alignment
-- Button placement
-- Card dimensions
-- Form field heights
-- Dialog dimensions
-- Tab positions
-- Breadcrumb placement
+## 3. Instruction Hierarchy
 
-### 4. Component Consistency
-All reusable components MUST use centralized
-SmartIAM design tokens.
+Before implementation, read:
+1. This root AGENTS.md.
+2. frontend/AGENTS.md.
+3. Applicable design and coding standards.
+4. Approved screenshots and design references.
+5. Relevant functional requirements.
 
-Do not hardcode arbitrary colors, spacing, or
-component dimensions inside feature pages.
+Follow the most specific applicable instructions
+unless they conflict with mandatory security rules.
 
-Do not use default AG Grid styling without adapting
-it to the approved SmartIAM design.
+## 4. Screenshot-Driven Design
 
-### 5. Screenshot Comparison
-For each screen:
+Approved SmartIAM screenshots are the visual baseline.
 
-1. Load the approved reference screenshot.
-2. Implement the Angular screen.
-3. Run the application.
-4. Capture a Playwright screenshot at the same viewport.
-5. Compare the reference and implementation.
-6. Check colors, spacing, layout, typography, and icons.
-7. Correct material visual differences.
-8. Repeat until the screen meets visual acceptance.
+Implement the same:
+- Background and surface colors
+- Header and sidebar colors
+- Typography and text hierarchy
+- Spacing and alignment
+- Buttons and their positions
+- Navigation and icons
+- Grids and forms
+- Cards, borders, shadows, and radius
+- Dialogs, drawers, toasts, and wizards
 
-Use image-diff tooling for repeatable comparisons.
+Extract verified design values into centralized
+design tokens.
 
-### 6. Responsive Behavior
-Preserve the approved desktop appearance.
+Do not invent colors and claim visual equivalence.
 
-For tablet and mobile:
-- Adapt navigation and content responsively.
-- Do not arbitrarily redesign the visual language.
-- Preserve colors, typography, and component styles.
-- Avoid horizontal overflow except within designated
-  data-grid containers.
+If reference screenshots are unavailable,
+document provisional design decisions.
 
-### 7. Dark Mode
-If an approved dark-mode screenshot exists, use it
-as the reference.
+Do not independently redesign approved screens.
 
-Do not invent a dark palette and claim it matches
-the approved design.
+## 5. Architecture Principles
 
-### 8. Definition of Done
-A screen is NOT complete unless:
-- Functional tests pass.
-- Accessibility checks pass.
-- Responsive tests pass.
-- Screenshot comparison is completed.
-- Visual differences are documented and resolved.
-- Design tokens are reused correctly.
-- No unauthorized design changes remain.
+Apply:
+- SOLID principles where appropriate
+- Separation of concerns
+- DRY without unnecessary abstraction
+- KISS
+- Composition over inheritance
+- Feature-based architecture
+- Dependency injection
+- Strong typing
+- Reusable components
+- Testable services
+- Explicit interfaces and contracts
+
+Avoid premature abstraction and overengineering.
+
+## 6. Design Pattern Guidelines
+
+Use patterns where they solve a real problem:
+
+Facade:
+- Feature-level orchestration
+- Authentication state
+- Dashboard data coordination
+
+Adapter:
+- Backend API integration
+- Mock API providers
+- External authentication providers
+
+Strategy:
+- Authentication providers
+- Client/server grid data sources
+- Export implementations
+
+Factory:
+- Configurable dialogs
+- Dynamic dashboard widgets
+
+Observer / Reactive State:
+- Angular Signals
+- RxJS asynchronous streams
+
+Composition:
+- Forms
+- Layouts
+- Reusable UI controls
+
+Document the reason for nontrivial patterns.
+
+Do not apply patterns unnecessarily.
+
+## 7. Reusable Component Rules
+
+All reusable UI controls must:
+- Use centralized design tokens
+- Follow approved visual styling
+- Be independent of business modules
+- Support keyboard interaction
+- Support accessibility requirements
+- Provide loading/error/disabled states
+- Expose typed APIs
+- Include tests and usage examples
+
+Avoid duplicating shared components.
+
+## 8. Security Requirements
+
+- Never hardcode secrets or credentials.
+- Never store authentication tokens in
+  localStorage or sessionStorage.
+- Prefer secure HttpOnly server sessions.
+- Never trust frontend authorization alone.
+- Validate input on the backend.
+- Avoid unsafe HTML injection.
+- Protect against open redirects.
+- Sanitize spreadsheet exports against
+  formula injection.
+- Avoid exposing sensitive data in logs.
+- Keep mock authentication isolated from production.
+- Follow least-privilege principles.
+
+## 9. Performance Requirements
+
+- Lazy-load feature routes.
+- Use OnPush change detection.
+- Use Signals for synchronous UI state.
+- Use RxJS for asynchronous operations.
+- Avoid unnecessary subscriptions.
+- Cancel obsolete HTTP requests.
+- Support server-side pagination for large datasets.
+- Avoid rendering excessive DOM elements.
+- Monitor bundle size and runtime performance.
+
+## 10. Accessibility Requirements
+
+Target WCAG 2.2 AA.
+
+Support:
+- Keyboard navigation
+- Visible focus indicators
+- Accessible labels
+- Screen-reader announcements
+- Dialog focus management
+- Sufficient color contrast
+- Responsive zoom and reflow
+- Accessible validation feedback
+
+## 11. Coding Standards
+
+- Strict TypeScript.
+- Descriptive names.
+- Small focused components.
+- No unexplained any types.
+- No unused imports or variables.
+- No duplicated business logic.
+- No hardcoded API endpoints.
+- No direct HTTP calls from generic UI controls.
+- No business-specific logic inside shared components.
+- Use consistent file and folder naming.
+- Keep components maintainable and testable.
+
+## 12. Testing Requirements
+
+For relevant changes, implement:
+- Unit tests
+- Component tests
+- Integration tests
+- Playwright end-to-end tests
+- Screenshot visual regression tests
+- Accessibility checks
+
+Tests must verify actual behavior.
+
+Never claim tests passed unless executed.
+
+## 13. Definition of Done
+
+A task is complete only when:
+1. Requirements are implemented.
+2. Code follows architecture standards.
+3. Build succeeds.
+4. Relevant tests pass.
+5. Security considerations are reviewed.
+6. Accessibility is checked.
+7. Responsive behavior is verified.
+8. Screenshot alignment is reviewed.
+9. Documentation is updated.
+10. Remaining gaps are explicitly reported.
+
+## 14. Implementation Workflow
+
+For each development task:
+
+1. Inspect the repository.
+2. Read applicable AGENTS.md files.
+3. Review requirements and screenshots.
+4. Produce a short implementation plan.
+5. Identify reusable components.
+6. Implement the smallest complete feature.
+7. Run build and relevant tests.
+8. Review visual and functional behavior.
+9. Document the result.
+10. Report unresolved issues.
+
+Do not recreate the Angular project.
+Do not overwrite unrelated code.
+Do not modify approved designs without authorization.
+
+## 15. Git Workflow
+
+- Use feature branches for development.
+- Keep changes focused.
+- Write meaningful commit messages.
+- Never commit secrets or generated build outputs.
+- Review changes before committing.
+- Do not push or merge without explicit approval.
+
+## 16. Execution Priorities
+
+Implement in this order:
+
+Phase 1:
+Design system and administration shell.
+
+Phase 2:
+Authentication, logout, profile, session management.
+
+Phase 3:
+Reusable form controls and buttons.
+
+Phase 4:
+Dialogs, notifications, progress bars, wizards.
+
+Phase 5:
+Enterprise grids, pagination, CSV/XLSX export.
+
+Phase 6:
+Dashboards, administration templates,
+component showcase.
+
+Phase 7:
+Visual regression, accessibility, security,
+performance, and integration testing.
+
+Complete and verify each phase before starting
+the next phase.

@@ -1,0 +1,25 @@
+export * from './textbox';
+export * from './password';
+export * from './textarea';
+export * from './number-input';
+export * from './dropdown';
+export * from './autocomplete';
+export * from './multi-select';
+export * from './checkbox';
+export * from './radio-group';
+export * from './toggle';
+export * from './date-picker';
+export * from './date-range-picker';
+export * from './file-upload';
+export * from './form-field';
+export * from './actions';
+export * from './display';
+export * from './tabs';
+export * from './accordion';
+export * from './tooltip';
+export * from './breadcrumb';
+export * from './drawer';
+// Existing primitives stay authoritative; aliases avoid duplicate implementations.
+export { PageHeader as SmartPageHeader } from '../page-header';
+export { FeedbackState as SmartEmptyState } from '../feedback-state';
+export { CanDirective as SmartPermission } from '../../core/auth/can.directive';

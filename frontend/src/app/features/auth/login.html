@@ -1,0 +1,27 @@
+<div class="login-page" [class.embedded]="embedded()" [attr.role]="embedded() ? null : 'main'">
+  <section class="login-brand" aria-label="SmartIAM Identity and Access Management"><span class="logo"><iam-icon name="Shield" [size]="36" /></span><strong>SmartIAM</strong><p>Identity &amp; Access Management</p></section>
+  <section class="panel login-card" aria-labelledby="login-title">
+    @if (embedded()) { <h2 id="login-title">Sign in to SmartIAM</h2> } @else { <h1 id="login-title">Sign in to SmartIAM</h1> }<p class="intro">Secure access to your administration workspace.</p>
+    @if (config.mode === 'mock') { <p class="mode-note">Development mock authentication. Sessions are held in memory.</p> }
+    @if (reason().get('reason') === 'expired') { <p class="notice" role="status">Your session expired. Sign in again to continue.</p> }
+    @if (previewState() === 'expired') { <p class="notice" role="status">Preview: your session expired. Sign in again to continue.</p> }
+    @if (previewState() === 'invalid') { <p class="notice" role="alert">Preview: invalid username or password.</p> }
+    @if (reason().get('reason') === 'logout') { <p class="notice" role="status">You have been signed out.</p> }
+    @if (auth.status() === 'unavailable' || reason().get('reason') === 'offline') { <div class="notice" role="alert"><p>The authentication service could not be reached. Access is unavailable until your session can be verified.</p><button iamButton (click)="auth.reconnect()">Reconnect</button></div> }
+    @if (auth.logoutFailed()) { <div class="notice" role="alert"><p>Signed out locally. The service could not confirm server sign-out; the server session may still exist.</p><button iamButton (click)="auth.retryLogout()">Retry server sign-out</button></div> }
+    <form [formGroup]="form" (ngSubmit)="signIn()" [attr.aria-busy]="busy()" novalidate>
+      @if (config.providers.length > 1) { <label for="login-provider">Authentication provider</label><select id="login-provider" class="field" formControlName="provider">@for (provider of config.providers; track provider) { <option [value]="provider">{{ providerLabels[provider] }}</option> }</select> }
+      @if (local()) {
+        <label for="username">Username or email <span aria-hidden="true">*</span></label><input id="username" class="field" formControlName="username" autocomplete="username" maxlength="128" required [attr.aria-invalid]="form.controls.username.touched && form.controls.username.invalid" aria-describedby="username-error" />
+        <p id="username-error" class="validation">@if (form.controls.username.touched && form.controls.username.invalid) { Enter a username or email. }</p>
+        <label for="password">Password <span aria-hidden="true">*</span></label><div class="password-field"><input id="password" formControlName="password" [type]="showPassword() ? 'text' : 'password'" autocomplete="current-password" maxlength="256" required [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid" aria-describedby="password-error" /><button type="button" class="password-toggle" [attr.aria-pressed]="showPassword()" (click)="showPassword.set(!showPassword())">{{ showPassword() ? 'Hide password' : 'Show password' }}</button></div>
+        <p id="password-error" class="validation">@if (form.controls.password.touched && form.controls.password.invalid) { Enter your password. }</p>
+        @if (config.rememberUsername) { <label class="remember"><input type="checkbox" formControlName="remember" />Remember username</label> }
+      }
+      @if (error()) { <p class="notice" role="alert">{{ error() }}</p> }
+      <button iamButton variant="primary" type="submit" class="sign-in" [loading]="busy() || auth.signingOut() || previewState() === 'loading'">{{ auth.signingOut() ? 'Signing out…' : busy() || previewState() === 'loading' ? 'Signing in…' : local() ? 'Sign In' : 'Continue with ' + providerLabels[form.controls.provider.value] }}</button>
+      <div class="divider">or</div><button iamButton type="button" class="sign-in" [disabled]="!config.providers.includes('entra') || busy() || auth.signingOut()" (click)="signIn('entra')"><iam-icon name="Layers" [size]="18" />Sign in with Microsoft Entra ID</button>
+      @if (config.mode === 'mock') { <p class="hint">Entra ID requires the backend-managed authentication flow.</p> }
+    </form>
+  </section>
+</div>

@@ -1,4 +1,12 @@
+# Phase 3 component library
+
+Standalone controls are exported from `src/app/shared/ui`. Start development mode, sign in as the documented administrator, and open `/dev/components` for interactive form states and copyable examples. See [component APIs, design evidence and limitations](docs/PHASE_3_COMPONENTS.md). The showcase is excluded from production.
+
 # SmartiamFrontend
+
+Phase 2 adds guarded login/logout, My Profile, permissions and idle sessions. Run `npm.cmd start` for development mock mode; use `admin@example.test` or `reader@example.test` with the public fixture password `Demo-only!23`. Sessions are memory-only and require sign-in after reload. Production builds use the BFF and exclude mock credentials/showcase code. See [Phase 2 usage/security/verification](docs/PHASE_2_AUTH.md) and [required backend endpoints](docs/BACKEND_AUTH_CONTRACT.md). `npm.cmd run verify:production-auth` checks a production build for development auth code.
+
+The working [Phase 1B administration shell](docs/design/PHASE_1B.md) uses the [Phase 1A analysis](docs/design/DESIGN_ANALYSIS.md), [central tokens](src/design/tokens.css) and [253-screen manifest](docs/design/SCREEN_MANIFEST.md). Open `/administration` or `/dashboard` for the mock dashboard. “System Actions” previews loading, empty and error states; all data is read-only sample data. Nested navigation, breadcrumb links, theme selection, page/role search and notification/profile placeholders work. Business administration and authentication remain future phases.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.43.
 
@@ -49,10 +57,10 @@ ng test
 For end-to-end (e2e) testing, run:
 
 ```bash
-ng e2e
+npm run test:e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Playwright uses installed Google Chrome and starts the development server automatically. Run `npm run test:unit` for headless component tests, `npm run typecheck` for strict TypeScript validation and `npm run build` for the production bundle. Run `npm run test:visual:update` only when intentionally reviewing and updating the implementation snapshots. These snapshots are regression baselines, not proof of equality with approved source images. There is no lint configuration in the starter; type checking is available, but is not a lint substitute.
 
 ## Additional Resources
 

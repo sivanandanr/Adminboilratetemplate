@@ -1,1 +1,60 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+@import './design/tokens.css';
+@import './app/shared/ui/ui.css';
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--iam-canvas);
+  color: var(--iam-text);
+  font-family: var(--iam-font-family);
+  font-size: var(--iam-font-md);
+  line-height: 1.4;
+}
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button:disabled, [aria-disabled='true'] { cursor: not-allowed; opacity: .55; }
+:focus-visible { outline: 3px solid var(--iam-focus); outline-offset: 3px; }
+.sidebar :focus-visible { outline-color: var(--iam-on-sidebar); }
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--iam-control-height);
+  height: var(--iam-control-height);
+  flex-shrink: 0;
+  background: transparent;
+  color: inherit;
+  border: 1px solid transparent;
+  border-radius: var(--iam-radius-sm);
+}
+.icon-button:hover { background: var(--iam-hover); }
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--iam-space-2);
+  min-height: var(--iam-control-height);
+  padding: 6px 14px;
+  background: var(--iam-secondary-fill);
+  color: var(--iam-text);
+  border: 1px solid var(--iam-control-border);
+  border-radius: var(--iam-radius-md);
+  font-size: var(--iam-font-sm);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--iam-shadow);
+}
+.button:hover:not(:disabled) { border-color: var(--iam-accent); }
+.button-primary { background: var(--iam-primary); color: var(--iam-on-primary); border-color: var(--iam-primary); }
+.button[aria-busy='true'] { cursor: progress; }
+.panel { background: var(--iam-surface); border: 1px solid var(--iam-border); border-radius: var(--iam-radius-lg); box-shadow: var(--iam-shadow); }
+.skip-link { position: fixed; left: 12px; top: -100px; padding: 12px 20px; background: var(--iam-surface); color: var(--iam-text); z-index: 100; border: 2px solid var(--iam-accent); }
+.skip-link:focus { top: 12px; }
+h2 { font-size: var(--iam-font-lg); font-weight: 700; }
+.field { min-height: var(--iam-control-height); min-width: 0; padding: 6px 10px; color: var(--iam-text); background: var(--iam-control-fill); border: 1px solid var(--iam-control-border); border-radius: var(--iam-radius-md); }
+.badge { display: inline-flex; gap: 4px; align-items: center; padding: 2px 8px; min-height: 22px; border-radius: 20px; background: var(--iam-primary-soft); color: var(--iam-accent); font-size: var(--iam-font-xs); white-space: nowrap; }
+.badge-success { background: var(--iam-success-fill); color: var(--iam-success-text); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; } }

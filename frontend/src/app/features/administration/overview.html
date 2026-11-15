@@ -1,0 +1,45 @@
+<iam-page-header [title]="title" description="Configure, manage and monitor the SmartIAM platform." icon="Settings">
+  <span page-meta class="badge">Mock data</span>
+  <div page-actions class="context-actions">
+    <a *iamCan="'admin.configure'" class="button button-primary page-primary" routerLink="/administration/system"><iam-icon name="Plus" />Create Configuration</a>
+    <div class="actions-container" data-context-actions>
+      <button #actionTrigger iamButton aria-controls="dashboard-actions" [attr.aria-expanded]="actionsOpen()" (click)="toggleActions()"><iam-icon name="Settings" />System Actions<iam-icon name="ChevronDown" [size]="16" /></button>
+      <div id="dashboard-actions" class="actions-menu panel" [hidden]="!actionsOpen()">
+        <p>Mock dashboard previews</p>
+        <button (click)="preview('normal')">Refresh sample data</button>
+        <button (click)="preview('empty')">Show empty state</button>
+        <button (click)="preview('error')">Simulate error</button>
+      </div>
+    </div>
+  </div>
+</iam-page-header>
+
+@if (store.state(); as state) {
+  @if (state.status === 'loading' || state.status === 'ready') {
+    <section class="kpi-grid" aria-label="Administration metrics — mock data" [attr.aria-busy]="state.status === 'loading'">
+      @for (metric of metrics(); track metric.label) { <iam-kpi-card [metric]="metric" [loading]="state.status === 'loading'" /> }
+    </section>
+  }
+  <section class="panel configuration" aria-labelledby="configuration-title">
+    <h2 id="configuration-title">Administrative Configuration</h2>
+    <div class="configuration-grid">
+      @for (item of cards; track item.path) {
+        @if (allowed(item.path)) {
+        <a class="configuration-card" [class]="'configuration-card category-' + $index" [routerLink]="item.path"><iam-icon [name]="item.icon" [size]="28" /><div><h3>{{ cardTitles[$index] }}</h3><p>{{ descriptions[$index] }}</p></div><iam-icon name="ChevronRight" [size]="18" /></a>
+        }
+      }
+    </div>
+  </section>
+
+  @switch (state.status) {
+    @case ('loading') { <iam-feedback-state kind="loading" title="Loading administration dashboard" description="Loading the read-only sample metrics and activity." /> }
+    @case ('empty') { <iam-feedback-state kind="empty" title="No dashboard data" description="The empty mock scenario contains no metrics or activity." actionLabel="Load sample data" (retry)="preview('normal')" /> }
+    @case ('error') { <iam-feedback-state kind="error" title="Dashboard unavailable" [description]="state.message" actionLabel="Try again" (retry)="preview('normal')" /> }
+    @case ('ready') {
+      <div class="overview-grid">
+        <iam-role-summary [rows]="state.data.roles" (refresh)="preview('normal')" />
+        <iam-dashboard-support [activity]="state.data.activity" [services]="state.data.services" />
+      </div>
+    }
+  }
+}

@@ -1,0 +1,64 @@
+﻿<a class="skip-link" href="#main-content">Skip to main content</a>
+<div class="shell" [class.collapsed]="collapsed()" [class.mobile-open]="mobileOpen()">
+  @if (mobileOpen()) { <button class="backdrop" aria-label="Close navigation" tabindex="-1" (click)="closeNavigation()"></button> }
+  <aside id="sidebar" class="sidebar" aria-label="Application navigation">
+    <div class="brand-row">
+      <a class="brand" routerLink="/administration" aria-label="SmartIAM home">
+        <span class="brand-mark"><iam-icon name="Shield" [size]="28" /></span>
+        <span class="brand-copy"><strong>SmartIAM</strong><small>Identity &amp; Access Management</small></span>
+      </a>
+      <button #closeMenu class="close-menu icon-button" aria-label="Close navigation" (click)="closeNavigation()"><iam-icon name="X" /></button>
+    </div>
+    <nav aria-label="Main navigation">
+      <a *iamCan="'dashboard.view'" class="nav-row" routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page" title="Dashboard"><iam-icon name="LayoutDashboard" /><span>Dashboard</span></a>
+      @for (group of groups(); track group.id) {
+        <div class="navigation-group" [class.section-active]="isActive(group)">
+          <button class="nav-row group-trigger" [title]="group.label" [attr.aria-label]="group.label" [attr.aria-expanded]="expanded().has(group.id) && !collapsed()" [attr.aria-controls]="group.id + '-links'" (click)="toggleGroup(group.id)">
+            <iam-icon [name]="group.icon" /><span>{{ group.label }}</span><iam-icon class="chevron" [name]="expanded().has(group.id) ? 'ChevronDown' : 'ChevronRight'" [size]="14" />
+          </button>
+          <div [id]="group.id + '-links'" class="subnav" [hidden]="!expanded().has(group.id) || collapsed()">
+            @for (item of group.items; track item.path) {
+              <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page"><iam-icon [name]="item.icon" [size]="15" /><span>{{ item.label }}</span></a>
+            }
+          </div>
+        </div>
+      }
+    </nav>
+  </aside>
+  <div class="workspace" [inert]="mobileOpen()">
+    <header class="header">
+      <button #menuToggle class="icon-button" aria-label="Toggle navigation" aria-controls="sidebar" [attr.aria-expanded]="mobileOpen() || !collapsed()" (click)="toggleNavigation()"><iam-icon name="Menu" /></button>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          @for (crumb of breadcrumbs(); track $index) {
+            <li>
+              @if ($index) { <iam-icon name="ChevronRight" [size]="14" /> }
+              @if (crumb.path && !$last) { <a [routerLink]="crumb.path">{{ crumb.label }}</a> }
+              @else { <span [attr.aria-current]="$last ? 'page' : null">{{ crumb.label }}</span> }
+            </li>
+          }
+        </ol>
+      </nav>
+      <div class="header-actions">
+        <form class="page-search" role="search" aria-label="Find a page" (submit)="findPage($event, pageSearch.value)">
+          <iam-icon name="Search" [size]="17" /><input #pageSearch type="search" aria-label="Search pages" placeholder="Search SmartIAM (Ctrl + K)" />
+        </form>
+        <button class="icon-button" [attr.aria-label]="theme.theme() === 'light' ? 'Switch to dark theme' : 'Switch to light theme'" (click)="theme.toggle()"><iam-icon [name]="theme.theme() === 'light' ? 'Moon' : 'Sun'" /></button>
+        <div class="popover-container" data-header-popover>
+          <button #notificationTrigger class="icon-button notification-button" aria-label="Notifications" aria-controls="notification-panel" [attr.aria-expanded]="popover() === 'notifications'" (click)="togglePopover('notifications')"><iam-icon name="Bell" /><span class="notification-dot" aria-hidden="true"></span></button>
+          <section id="notification-panel" class="header-popover" [hidden]="popover() !== 'notifications'" aria-labelledby="notification-title">
+            <h2 id="notification-title">Notifications</h2><p>Notification service is not connected.</p><a *iamCan="'profile.view'" routerLink="/notifications">Open notifications placeholder <iam-icon name="ArrowRight" [size]="15" /></a>
+          </section>
+        </div>
+        <div class="popover-container" data-header-popover>
+          <button #profileTrigger class="profile-trigger" aria-label="My Profile" aria-controls="profile-panel" [attr.aria-expanded]="popover() === 'profile'" (click)="togglePopover('profile')"><span class="avatar" aria-hidden="true">{{ auth.initials() }}</span><span class="profile-copy"><strong>{{ auth.user()?.displayName }}</strong><small>{{ auth.user()?.provider === 'mock' ? 'Development session' : auth.user()?.provider }}</small></span><iam-icon name="ChevronDown" [size]="14" /></button>
+          <section id="profile-panel" class="header-popover" [hidden]="popover() !== 'profile'" aria-labelledby="profile-title"><h2 id="profile-title">My Profile</h2><p>{{ auth.user()?.username }}</p><a *iamCan="'profile.view'" routerLink="/profile"><iam-icon name="UserRound" [size]="16" />View My Profile</a><button class="button" [disabled]="auth.permissionsLoading()" (click)="auth.revalidate()">Refresh permissions</button><button class="button" (click)="popover.set(null); auth.confirmLogout.set(true)">Logout</button></section>
+        </div>
+      </div>
+    </header>
+    <p class="search-feedback" role="status" [hidden]="!searchMessage()">{{ searchMessage() }}</p>
+    @if (auth.permissionsLoading()) { <p class="search-feedback" role="status">Resolving permissions…</p> }
+    <main #main id="main-content" tabindex="-1"><router-outlet (activate)="updateContext()" /></main>
+  </div>
+</div>
+

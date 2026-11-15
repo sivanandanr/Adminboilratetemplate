@@ -1,0 +1,13 @@
+﻿        <section class="panel role-panel" aria-labelledby="roles-title">
+          <div class="panel-toolbar"><div class="panel-title"><span class="panel-icon"><iam-icon name="Users" [size]="26" /></span><div><h2 id="roles-title">Roles &amp; Permissions</h2><p>Sample roles and access control summary.</p></div></div><div class="toolbar-actions"><a *iamCan="'admin.view'" class="button button-primary" routerLink="/administration/roles"><iam-icon name="Users" [size]="16" />View Roles</a><button iamButton (click)="refresh.emit()"><iam-icon name="RefreshCw" [size]="16" />Refresh</button></div></div>
+          <div class="role-filters"><label class="search-field"><iam-icon name="Search" [size]="18" /><span class="sr-only">Search sample roles</span><input type="search" [formControl]="roleSearch" placeholder="Search role by name or description…" /></label><span class="sample-label">Read-only sample · {{ roles().length }} roles</span></div>
+          @if (roles().length) {
+            <div class="table-scroll" role="region" aria-label="Sample role summary" tabindex="0">
+              <table><caption class="sr-only">Mock role summary. No live user or permission data.</caption><thead><tr><th scope="col">Role Name</th><th scope="col">Role Type</th><th scope="col">Description</th><th scope="col">Users</th><th scope="col">Permissions</th><th scope="col">Status</th></tr></thead><tbody>
+                @for (role of roles(); track role.name) { <tr><th scope="row">@if (auth.can('admin.view')) { <a routerLink="/administration/roles">{{ role.name }}</a> } @else { {{ role.name }} }</th><td><span class="category-badge" [class]="'category-badge ' + role.category.toLowerCase()">{{ role.category }}</span></td><td>{{ role.description }}</td><td>{{ role.users }}</td><td>{{ role.permissions }}</td><td><span class="badge badge-success"><iam-icon name="CircleCheck" [size]="12" />Active</span></td></tr> }
+              </tbody></table>
+            </div>
+          } @else { <iam-feedback-state kind="empty" title="No matching roles" description="Try a different role name, category or description." actionLabel="Clear search" (retry)="roleSearch.setValue('')" /> }
+          <div class="table-footer"><span role="status">{{ roles().length }} of {{ rows().length }} sample roles</span><a *iamCan="'admin.view'" routerLink="/administration/roles">Open Roles &amp; Permissions <iam-icon name="ArrowRight" [size]="14" /></a></div>
+        </section>
+

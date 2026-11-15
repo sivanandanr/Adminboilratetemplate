@@ -1,0 +1,11 @@
+:host { display: block; min-width: 0; }
+h2 { margin: 0; letter-spacing: -.4px; }
+p { font-size: var(--iam-font-sm); color: var(--iam-text-secondary); margin: 0; }
+.sample-label { font-size: var(--iam-font-xs); color: var(--iam-text-secondary); }
+.activity-icon { display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; color: var(--iam-accent); background: var(--iam-primary-soft); }
+.supporting-panels { display: grid; gap: var(--iam-space-4); }.activity-panel, .health-panel { padding: var(--iam-space-4); }.support-title { display: flex; align-items: center; gap: var(--iam-space-2); margin-bottom: var(--iam-space-2); }.support-title > iam-icon { color: var(--iam-accent); }
+ul { padding: 0; margin: 0; list-style: none; }.activity-panel li { display: flex; align-items: center; gap: 8px; padding: 5px 0; }.activity-panel li > div { min-width: 0; flex: 1; }.activity-panel strong { font-size: var(--iam-font-xs); font-weight: 600; }.activity-panel p { font-size: 11px; margin-top: 2px; }.activity-icon { width: 34px; height: 34px; }
+.health-content { display: flex; align-items: center; gap: var(--iam-space-3); margin-top: var(--iam-space-3); }.health-content ul { flex: 1; min-width: 0; }.health-content li { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--iam-border); padding: 6px 0; font-size: var(--iam-font-xs); }.health-content li > iam-icon { color: var(--iam-accent); }.health-content li > .badge { margin-left: auto; }.uptime { width: 120px; flex-shrink: 0; text-align: center; }.gauge { display: grid; place-items: center; width: 108px; height: 108px; margin: auto; border: 8px solid var(--iam-success-text); border-bottom-color: transparent; border-radius: 50%; }.gauge strong { font-size: 24px; }.uptime p { font-size: 11px; margin-top: -10px; }
+
+@media (min-width: 901px) and (max-width: 1400px) { .supporting-panels { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .activity-panel .badge { display: none; }.health-content { flex-direction: column; align-items: stretch; }.uptime { align-self: center; } }

@@ -1,0 +1,23 @@
+/* Source palette/geometry: UI-037 form, UI-246 regular controls. Interaction mappings are provisional. */
+smart-textbox, smart-password, smart-textarea, smart-number-input, smart-dropdown, smart-autocomplete, smart-multi-select, smart-checkbox, smart-radio-group, smart-toggle, smart-date-picker, smart-date-range-picker, smart-file-upload { display:block; min-width:0; }
+.smart-input { width:100%; min-height:var(--iam-control-height); padding:6px 10px; border:1px solid var(--iam-control-border); border-radius:var(--iam-radius-md); color:var(--iam-text); background:var(--iam-control-fill); }
+.smart-input:hover:not(:disabled) { border-color:var(--iam-accent); }
+.smart-input[aria-invalid='true'] { border-color:var(--iam-icon-danger); }
+.smart-input[readonly], .smart-input[aria-readonly='true'] { background:var(--iam-surface); }
+.smart-input:disabled { opacity:.55; cursor:not-allowed; }
+.smart-hint { font-size:var(--iam-font-xs); color:var(--iam-text-secondary); margin:4px 0 0; }
+.smart-errors { color:var(--iam-error-text); font-size:var(--iam-font-xs); }.smart-errors p { margin:4px 0 0; padding:4px 8px; border-left:3px solid var(--iam-icon-danger); background:var(--iam-danger-fill); color:var(--iam-sidebar); }
+.smart-input-row { display:flex; align-items:center; gap:var(--iam-space-2); }.smart-input-row>.smart-input { min-width:0; flex:1; }
+.smart-section { border:1px solid var(--iam-border); border-radius:var(--iam-radius-lg); background:var(--iam-surface); padding:var(--iam-space-4); min-width:0; }.smart-section > legend { font-size:var(--iam-font-lg); font-weight:700; padding:0 8px; }
+.smart-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--iam-space-4); }
+.smart-choice { display:flex; align-items:center; gap:var(--iam-space-2); min-height:var(--iam-control-height); }.smart-choice input { accent-color:var(--iam-accent); width:18px; height:18px; }
+.smart-choices { border:0; padding:0; margin:0; min-width:0; }.smart-choices legend { font-weight:600; }
+.smart-popover { position:absolute; z-index:25; background:var(--iam-surface); color:var(--iam-text); border:1px solid var(--iam-control-border); border-radius:var(--iam-radius-md); box-shadow:var(--iam-shadow); width:100%; max-height:280px; overflow:auto; padding:4px; margin:4px 0; list-style:none; }
+.smart-option { padding:8px; cursor:pointer; border-radius:var(--iam-radius-sm); }.smart-option[aria-selected='true'],.smart-option.is-active { background:var(--iam-hover); }.smart-option[aria-disabled='true'] { cursor:not-allowed; }
+.smart-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; margin:4px 4px 0 0; background:var(--iam-primary-soft); border-radius:var(--iam-radius-md); }
+.smart-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:var(--iam-space-2); margin-top:var(--iam-space-4); }
+.smart-actions[data-placement='page'], .smart-actions[data-placement='grid'] { margin-top:0; }.smart-actions[data-placement='row'] { gap:4px; margin:0; }.smart-actions[data-placement='wizard'] { justify-content:space-between; }
+.smart-card { padding:var(--iam-space-4); }.smart-card h2 { margin:0 0 12px; }.smart-divider { border:0; border-top:1px solid var(--iam-border); margin:var(--iam-space-4) 0; }
+.button.button-outline { background:transparent; color:var(--iam-accent); border-color:var(--iam-accent); }.button.button-ghost { background:transparent; box-shadow:none; border-color:transparent; }.button.button-danger { background:var(--iam-danger-fill); color:var(--iam-sidebar); border-color:var(--iam-icon-danger); }.button.button-small { min-height:30px; padding:4px 8px; }.button.button-large { min-height:42px; padding:8px 18px; }
+.smart-tablist { display:flex; overflow-x:auto; border-bottom:1px solid var(--iam-border); gap:8px; }.smart-tab { flex-shrink:0; min-height:42px; padding:8px 12px; background:transparent; border:0; border-bottom:3px solid transparent; color:var(--iam-text); }.smart-tab[aria-selected='true'] { color:var(--iam-accent); border-bottom-color:var(--iam-accent); font-weight:600; }
+@media(max-width:767px) { .smart-form-grid { grid-template-columns:1fr; } }

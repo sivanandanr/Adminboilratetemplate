@@ -1,0 +1,103 @@
+/* UI-246 source coordinates and M/E/P confidence: docs/design/DESIGN_TOKENS.md.
+   Exact raster samples become representative flat fills; geometry is estimated. */
+:root {
+  color-scheme: light;
+  --iam-sidebar: #000d2b; /* UI-246 (8,400) */
+  --iam-canvas: #f4f2fd; /* UI-246 (280,55) */
+  --iam-surface: #fbfafe; /* UI-246 (800,260) */
+  --iam-control-fill: #fbfafd; /* UI-246 (880,524) */
+  --iam-secondary-fill: #fcfbfe; /* UI-246 (1500,110) */
+  --iam-header: #f5f4fe; /* UI-246 (900,20) */
+  --iam-primary: #6502fc; /* UI-246 (1210,90) */
+  --iam-accent: var(--iam-primary);
+  --iam-on-primary: #ffffff;
+  --iam-text: #000000; /* UI-246 title glyphs */
+  --iam-text-secondary: #000026; /* UI-246 subtitle glyphs */
+  --iam-primary-soft: #f0ebfd;
+  --iam-sidebar-active: #3c2994;
+  --iam-on-sidebar: #ffffff;
+  --iam-border: #e4e4fa; /* UI-246 (900,384) */
+  --iam-control-border: #d7dcfe; /* UI-246 (800,512) */
+  --iam-grid-header: #f1f0fd;
+  --iam-grid-row: #fbfbfe;
+  --iam-success-fill: #d2f6da;
+  --iam-success-text: #005f00;
+  --iam-danger-fill: #fee4e6;
+  --iam-warning-fill: #fef6e8;
+  --iam-info-fill: #eaf2fe;
+  --iam-info-text: #0043fc;
+  --iam-neutral-fill: #ebecf2;
+  --iam-system-fill: #eddcfe;
+  --iam-business-fill: #c8e5fe;
+  --iam-operational-fill: #ffeadf;
+  /* Additional UI-246 blank tile samples measured during Phase 1B. */
+  --iam-tile-system: #edf6fe; /* (700,350) */
+  --iam-tile-notifications: #fef0f0; /* (1000,350) */
+  --iam-tile-audit: #eff7f4; /* (1250,350) */
+  --iam-tile-scheduler: #f2edfe; /* (1500,350) */
+  /* UI-246 glyph-region samples; representative low-confidence flat accents. */
+  --iam-icon-system: #0056f6;
+  --iam-icon-notifications: #fc4000;
+  --iam-icon-audit: #067b21;
+  --iam-icon-danger: #fd0000; /* UI-007 Revoke glyph, Phase 1A */
+  /* Provisional interactions/elevation: source images do not establish states. */
+  --iam-hover: var(--iam-primary-soft);
+  --iam-sidebar-hover: var(--iam-sidebar-active);
+  --iam-focus: var(--iam-accent);
+  --iam-backdrop: rgb(0 13 43 / 55%);
+  --iam-shadow: 0 2px 3px rgb(60 41 148 / 10%);
+  --iam-font-family: Arial, Helvetica, sans-serif;
+  --iam-font-xs: 12px;
+  --iam-font-sm: 13px;
+  --iam-font-md: 14px;
+  --iam-font-lg: 18px;
+  --iam-font-title: 26px;
+  --iam-space-1: 4px;
+  --iam-space-2: 8px;
+  --iam-space-3: 12px;
+  --iam-space-4: 16px;
+  --iam-space-5: 24px;
+  --iam-space-6: 32px;
+  --iam-radius-sm: 4px;
+  --iam-radius-md: 6px;
+  --iam-radius-lg: 10px;
+  --iam-sidebar-width: 274px;
+  --iam-sidebar-collapsed-width: 68px; /* P: no collapsed reference */
+  --iam-header-height: 50px;
+  --iam-control-height: 36px;
+  /* P: dark error copy on sampled danger tint avoids inaccessible small red text. */
+  --iam-error-text: var(--iam-text-secondary);
+  --iam-page-action-height: 42px;
+  --iam-page-primary-width: 238px; /* E: UI-246 x1202..1440 */
+  --iam-page-secondary-width: 200px; /* E: UI-246 x1456..1656 */
+  --iam-navigation-height: 34px;
+  --iam-navigation-child-height: 31px;
+  --iam-kpi-height: 88px;
+  --iam-grid-row-height: 40px;
+}
+
+/* Provisional dark mapping, using UI-094 measured surfaces, not a theme clone. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --iam-canvas: #141d33; /* UI-094 (1000,130) */
+  --iam-surface: #19213f; /* UI-094 (248,210) */
+  --iam-header: #0e1627; /* UI-094 (500,20) */
+  --iam-control-fill: #141b2e; /* UI-094 (800,360) */
+  --iam-secondary-fill: var(--iam-control-fill);
+  --iam-text: #ffffff;
+  --iam-text-secondary: #ffffff;
+  --iam-accent: #c7acfc; /* UI-094 (1605,110), glyph sample reused provisionally */
+  --iam-border: color-mix(in srgb, var(--iam-accent) 30%, var(--iam-surface));
+  --iam-control-border: var(--iam-accent);
+  --iam-primary-soft: #1d2541; /* UI-094 (1000,290) */
+  --iam-grid-header: var(--iam-primary-soft);
+  --iam-grid-row: var(--iam-surface);
+  --iam-tile-system: var(--iam-primary-soft);
+  --iam-tile-notifications: var(--iam-primary-soft);
+  --iam-tile-audit: var(--iam-primary-soft);
+  --iam-tile-scheduler: var(--iam-primary-soft);
+  --iam-icon-system: var(--iam-accent);
+  --iam-icon-notifications: var(--iam-accent);
+  --iam-icon-audit: var(--iam-accent);
+  --iam-shadow: none;
+}
