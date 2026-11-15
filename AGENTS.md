@@ -293,3 +293,7 @@ performance, and integration testing.
 
 Complete and verify each phase before starting
 the next phase.
+## UI rules
+- Keep the existing fonts. Never hard-code colors in components; use the semantic theme tokens.
+- Use the shared Button, StatusBadge, Toast, Dialog, BlockUi, Idle and unsaved-changes patterns. See docs/ui-patterns.md.
+- One solid main button per screen. Approve, reject, delete, remove and withdraw always ask for confirmation.
