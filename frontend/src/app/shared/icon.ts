@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { Activity, Bell, CalendarDays, ChevronDown, ChevronRight, FileSearch, Layers, LayoutDashboard, Menu, Settings, Shield, SlidersHorizontal, Users, X, ArrowRight, Plus, RefreshCw, Sun, Moon, CircleAlert, CircleCheck, Inbox, LoaderCircle, UserRound, Search, KeyRound, Workflow, Network, ClipboardCheck, Download, EllipsisVertical, LucideAngularModule } from 'lucide-angular';
+import { Pencil, Clock, Check, Trash2, Info, TriangleAlert, Activity, Bell, CalendarDays, ChevronDown, ChevronRight, FileSearch, Layers, LayoutDashboard, Menu, Settings, Shield, SlidersHorizontal, Users, X, ArrowRight, Plus, RefreshCw, Sun, Moon, CircleAlert, CircleCheck, Inbox, LoaderCircle, UserRound, Search, KeyRound, Workflow, Network, ClipboardCheck, Download, EllipsisVertical, LucideAngularModule } from 'lucide-angular';
 
-const icons = { Activity, Bell, CalendarDays, ChevronDown, ChevronRight, FileSearch, Layers, LayoutDashboard, Menu, Settings, Shield, SlidersHorizontal, Users, X, ArrowRight, Plus, RefreshCw, Sun, Moon, CircleAlert, CircleCheck, Inbox, LoaderCircle, UserRound, Search, KeyRound, Workflow, Network, ClipboardCheck, Download, EllipsisVertical };
+const icons = { Pencil, Clock, Check, Trash2, Info, TriangleAlert, Activity, Bell, CalendarDays, ChevronDown, ChevronRight, FileSearch, Layers, LayoutDashboard, Menu, Settings, Shield, SlidersHorizontal, Users, X, ArrowRight, Plus, RefreshCw, Sun, Moon, CircleAlert, CircleCheck, Inbox, LoaderCircle, UserRound, Search, KeyRound, Workflow, Network, ClipboardCheck, Download, EllipsisVertical };
 export type IconName = keyof typeof icons;
 
 /** Decorative icons; the enclosing control supplies its accessible name. */

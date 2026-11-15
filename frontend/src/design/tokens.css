@@ -103,3 +103,73 @@
   --iam-icon-audit: var(--iam-accent);
   --iam-shadow: none;
 }
+
+/* Feedback references: docs/design/FEEDBACK_ALIGNMENT.md records raster evidence.
+   Scoped tokens keep the established shell, grids and form palette unchanged. */
+:root {
+  --iam-feedback-surface: #ffffff;
+  --iam-feedback-title: #16192c;
+  --iam-toast-title: #202335;
+  --iam-feedback-muted: #646b7f;
+  --iam-feedback-border: #e7e4f2;
+  --iam-feedback-success-fill: #ecfdf3;
+  --iam-feedback-success-icon: #20ba72;
+  --iam-feedback-error-fill: #fef3f2;
+  --iam-feedback-danger: #d92d20;
+  --iam-feedback-danger-text: var(--iam-feedback-danger);
+  --iam-feedback-on-danger: var(--iam-on-primary);
+  --iam-feedback-shadow: 0 8px 24px rgb(22 25 44 / 12%);
+  --iam-toast-radius: 16px;
+  --iam-dialog-radius: 20px;
+  --iam-toast-width: 380px;
+  --iam-dialog-width: 460px;
+}
+:root[data-theme='dark'] {
+  --iam-feedback-surface: var(--iam-surface);
+  --iam-feedback-title: var(--iam-text);
+  --iam-toast-title: var(--iam-text);
+  --iam-feedback-muted: #bcc3d7; /* P: readable dark counterpart; no dark feedback reference. */
+  --iam-feedback-border: var(--iam-border);
+  --iam-feedback-success-fill: #163c32; /* P: scoped dark tone mapping. */
+  --iam-feedback-error-fill: #482a35; /* P: scoped dark tone mapping. */
+  --iam-feedback-danger-text: #ffaca5; /* P: AA error copy on dark surfaces. */
+}
+
+/* Part 2: semantic aliases reuse the approved palette and feedback geometry. */
+:root {
+  --iam-progress-track: var(--iam-primary-soft);
+  --iam-progress-running: var(--iam-primary);
+  --iam-progress-completed: var(--iam-feedback-success-icon);
+  --iam-progress-failed: var(--iam-feedback-danger);
+  --iam-progress-cancelled: var(--iam-feedback-muted);
+  --iam-layer-loading: 35;
+  --iam-layer-tasks: 45;
+  --iam-app-footer-height: 32px; /* Reserved anchor; the footer itself is Part 4. */
+}
+:root[data-theme='dark'] { --iam-progress-running: var(--iam-accent); }
+
+:root { --iam-progress-completed-text: var(--iam-success-text); }
+:root[data-theme='dark'] { --iam-progress-completed-text: var(--iam-feedback-success-icon); }
+
+/* P: a small contrast correction for red copy on the sampled pale-red backing. */
+:root { --iam-progress-failed-text: color-mix(in srgb, var(--iam-feedback-danger) 92%, var(--iam-feedback-title)); }
+:root[data-theme='dark'] { --iam-progress-failed-text: var(--iam-feedback-danger-text); }
+/* Part 4: shared layout and native-top-layer stacking contracts. */
+:root {
+  --iam-app-footer-offset: var(--iam-app-footer-height);
+  --iam-tasks-clearance: 0px;
+  --iam-form-footer-clearance: 96px;
+  --iam-layer-content: 0;
+  --iam-layer-sticky: 10;
+  --iam-layer-navigation-backdrop: 20;
+  --iam-layer-navigation: 30;
+  --iam-layer-header: 35;
+  --iam-layer-footer: 35;
+  --iam-layer-popover: 40;
+  --iam-layer-mobile-backdrop: 46;
+  --iam-layer-mobile-navigation: 47;
+  --iam-layer-dialog: 50;
+  --iam-layer-block: 60;
+  --iam-layer-idle: 70;
+  --iam-layer-toast: 80;
+}

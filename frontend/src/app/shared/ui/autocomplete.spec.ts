@@ -25,4 +25,14 @@ describe('SmartAutocomplete asynchronous and keyboard behavior',()=>{
  it('supports multiple selection and bounds rendered records',async()=>{
   const {fixture,model,input,host}=await setup(); model.multiple=true; fixture.changeDetectorRef.markForCheck(); fixture.detectChanges(); await search(input,'ab'); model.requests[0].source.next({items:Array.from({length:500},(_,i)=>({value:String(i),label:`User ${i}`}))}); fixture.detectChanges(); expect(host.querySelectorAll('[role=option]').length).toBe(100); host.querySelector<HTMLElement>('[role=option]')!.click(); fixture.detectChanges(); expect(model.value.value).toEqual(['0']); host.querySelector<HTMLButtonElement>('[aria-label="Remove User 0"]')!.click(); expect(model.value.value).toEqual([]);
  });
+ it('wildcard bypasses minimum length and maps browse-all to an empty provider query',async()=>{
+  const {fixture,model,input}=await setup(); await search(input,'*'); expect(model.requests.length).toBe(1); expect(model.requests[0].query).toBe('');
+  model.requests[0].source.next({items:[{value:'a',label:'Alpha'}]}); fixture.detectChanges(); expect(fixture.nativeElement.textContent).toContain('Alpha');
+ });
+
+ it('does not submit the containing form when Enter has no active suggestion',async()=>{
+  const {fixture,model,input}=await setup(); await search(input,'ab'); model.requests[0].source.next({items:[]}); fixture.detectChanges();
+  const event=new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}); input.dispatchEvent(event); expect(event.defaultPrevented).toBeTrue();
+ });
+
 });

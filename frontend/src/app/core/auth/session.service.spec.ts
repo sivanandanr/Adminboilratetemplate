@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { AUTH_CONFIG, productionAuthConfig } from './auth.config';
 import { AUTH_CLOCK } from './auth.models';
 import { AuthFacade } from './auth.facade';
+import { BlockUiService } from '../feedback/block-ui.service';
 import { SessionService } from './session.service';
 import { SessionChannel, SessionEvent } from './session-channel';
 import { testSession } from './auth-test.providers';
@@ -54,4 +55,10 @@ describe('SessionService', () => {
     auth.session.update((snapshot) => ({ ...snapshot, serverTime: now })); session.check();
     now = 10_000; session.check(); expect(auth.logout).toHaveBeenCalledWith('expired');
   });
+  it('counts visible foreground work as activity but never extends authoritative server expiry', () => {
+    const session = TestBed.inject(SessionService), block = TestBed.inject(BlockUiService); session.check(); block.visible.set(true);
+    now = 11000; session.check(); expect(auth.logout).not.toHaveBeenCalled(); expect(session.warning()).toBeFalse();
+    auth.session.update(snapshot => ({ ...snapshot, expiresAt: 12000 })); now = 12000; session.check(); expect(auth.logout).toHaveBeenCalledWith('expired');
+  });
+
 });

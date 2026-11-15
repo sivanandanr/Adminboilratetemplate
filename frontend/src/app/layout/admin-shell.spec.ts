@@ -9,6 +9,12 @@ describe('AdminShell', () => {
     TestBed.configureTestingModule({ imports: [AdminShell], providers: [provideZonelessChangeDetection(), provideRouter([]), ...authTestProviders()] });
     await TestBed.inject(AuthFacade).initialize();
   });
+  it('mounts the data loading bar and connection banner once below the existing header', () => {
+    const fixture = TestBed.createComponent(AdminShell); fixture.detectChanges(); const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('smart-app-footer').length).toBe(1);
+    expect(host.querySelectorAll('smart-route-progress').length).toBe(1); expect(host.querySelectorAll('smart-offline-banner').length).toBe(1);
+    const header = host.querySelector('header')!; expect(header.nextElementSibling?.tagName.toLowerCase()).toBe('smart-route-progress');
+  });
   it('collapses navigation and reopens it through the Administration control', () => {
     spyOn(window, 'matchMedia').and.returnValue({ matches: false } as MediaQueryList);
     const fixture = TestBed.createComponent(AdminShell);

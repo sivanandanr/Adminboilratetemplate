@@ -1,11 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { SmartValueAccessor } from './value-accessor';
-import { SmartFormField } from './form-field';
-@Component({ selector: 'smart-multi-select', imports: [SmartFormField], hostDirectives: [{ directive: SmartValueAccessor, inputs: ['id', 'label', 'placeholder', 'hint', 'required', 'disabled', 'readonly', 'errors'] }], template: `<smart-form-field [forId]="field.id()" [label]="field.label()" [hint]="field.hint()" [required]="field.required()" [errors]="field.messages()"><select class="smart-input" [id]="field.id()"  [required]="field.required()" [disabled]="field.isDisabled()" [attr.aria-invalid]="field.invalid()" [attr.aria-describedby]="field.describedBy()" (blur)="field.blur()" multiple [size]="size()" [attr.aria-readonly]="field.readonly()" (keydown)="lock($event)" (pointerdown)="lock($event)" (change)="select($event)">@for (option of options(); track option.value) { <option [value]="option.value" [selected]="field.value()?.includes(option.value) ?? false" [disabled]="option.disabled">{{ option.label }}</option> }</select></smart-form-field>`, changeDetection: ChangeDetectionStrategy.OnPush })
+import { SmartAutocomplete, SmartDataProvider, SmartOption } from './autocomplete';
+/** Multiple selection uses the same searchable, paged, keyboard-accessible list as autocomplete. */
+@Component({ selector: 'smart-multi-select', imports: [SmartAutocomplete], hostDirectives: [{ directive: SmartValueAccessor, inputs: ['id', 'label', 'placeholder', 'hint', 'required', 'disabled', 'disabledReason', 'validationMode', 'readonly', 'errors'] }], template: `
+ <smart-autocomplete [id]="field.id()" [label]="field.label()" [placeholder]="field.placeholder()" [hint]="field.hint()" [required]="field.required()" [disabled]="field.isDisabled()" [disabledReason]="field.disabledReason()" [readonly]="field.readonly()" [errors]="field.messages()" [items]="options()" [provider]="provider()" [selectedLabels]="selectedLabels()" [multiple]="true" [selection]="field.value()" [pageSize]="pageSize()" [minLength]="minLength()" (selectionChanged)="change($event)" (blurred)="field.blur()" />`, changeDetection: ChangeDetectionStrategy.OnPush })
 export class SmartMultiSelect {
-  readonly field = inject<SmartValueAccessor<readonly string[]>>(SmartValueAccessor);
-  readonly options = input<readonly { value: string; label: string; disabled?: boolean }[]>([]);
-  readonly size = input(4);
-  lock(event: Event): void { if (this.field.readonly() && (!(event instanceof KeyboardEvent) || !['Tab', 'Escape'].includes(event.key))) event.preventDefault(); }
-  select(event: Event): void { const element = event.target as HTMLSelectElement; this.field.commit(Array.from(element.selectedOptions).map(option => option.value)); for (const option of Array.from(element.options)) option.selected = this.field.value()?.includes(option.value) ?? false; }
+ readonly field = inject<SmartValueAccessor<readonly string[]>>(SmartValueAccessor);
+ readonly options = input<readonly SmartOption[]>([]);
+ /** Retained for API compatibility; results now use accessible listbox paging. */
+ readonly size = input(4);
+ readonly provider = input<SmartDataProvider<SmartOption> | null>(null);
+ readonly pageSize = input(25);
+ readonly minLength = input(0);
+ readonly selectedLabels = input<Readonly<Record<string, string>>>({});
+ change(value: string | readonly string[] | null): void { this.field.commit(typeof value === 'string' ? [value] : value ?? []); }
 }

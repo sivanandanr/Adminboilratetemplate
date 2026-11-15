@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, Injectable, OnDestroy, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injectable, OnDestroy, effect, inject, input, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subscription, exhaustMap, map, takeWhile, timer } from 'rxjs';
-import { ApiError } from '../../core/auth/api-error';
+import { Observable, Subscription, exhaustMap, map, takeWhile, timer, switchMap, tap } from 'rxjs';
 import { AUTH_CONFIG } from '../../core/auth/auth.config';
 import { ErrorPresenter } from '../../core/feedback/error-presenter';
 import { GridRequest } from './grid.models';
-import { GridExportService, exportFilename } from './grid-export.service';
+import { exportFilename } from './grid-export.service';
 import { SmartButton } from '../ui/actions';
 import { SmartProgressBar } from '../ui/progress';
+import { TaskOptions, TaskService, TaskSnapshot } from '../../core/feedback/tasks.service';
+import { requestFeedback } from '../../core/feedback/request-feedback-context';
 export type ExportJobStatus = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled' | 'expired';
 export interface ExportJobRequest {
     readonly resource: string;
@@ -41,14 +42,32 @@ export function parseExportJob(value: unknown): ExportJob { if (!value || typeof
 export class ApiExportJobProvider implements ExportJobProvider {
     private readonly http = inject(HttpClient);
     private readonly base = inject(AUTH_CONFIG).apiBase.replace(/\/$/, '') + '/exports/jobs';
-    start(request: ExportJobRequest): Observable<ExportJob> { return this.http.post<unknown>(this.base, request).pipe(map(parseExportJob)); }
-    status(id: string): Observable<ExportJob> { return this.http.get<unknown>(this.path(id)).pipe(map(parseExportJob)); }
-    cancel(id: string): Observable<ExportJob> { return this.http.post<unknown>(this.path(id) + '/cancel', {}).pipe(map(parseExportJob)); }
-    download(id: string): Observable<ExportJobDownload> { const file = this.path(id) + '/file'; return this.http.get<unknown>(this.path(id) + '/download').pipe(map(value => { if (!value || typeof value !== 'object')
+    private readonly context = requestFeedback({ mode: 'background', errorToast: false });
+    start(request: ExportJobRequest): Observable<ExportJob> { return this.http.post<unknown>(this.base, request, { context: this.context }).pipe(map(parseExportJob)); }
+    status(id: string): Observable<ExportJob> { return this.http.get<unknown>(this.path(id), { context: this.context }).pipe(map(parseExportJob)); }
+    cancel(id: string): Observable<ExportJob> { return this.http.post<unknown>(this.path(id) + '/cancel', {}, { context: this.context }).pipe(map(parseExportJob)); }
+    download(id: string): Observable<ExportJobDownload> { const file = this.path(id) + '/file'; return this.http.get<unknown>(this.path(id) + '/download', { context: this.context }).pipe(map(value => { if (!value || typeof value !== 'object')
         throw new Error('Invalid download'); const data = value as Record<string, unknown>; if (data['url'] !== file || typeof data['filename'] !== 'string' || typeof data['expiresAt'] !== 'number' || !Number.isFinite(data['expiresAt']) || data['expiresAt'] <= Date.now())
         throw new Error('Download unavailable'); return { url: file, filename: data['filename'], expiresAt: data['expiresAt'] }; })); }
     private path(id: string): string { if (!/^[-A-Za-z0-9_]{1,200}$/.test(id))
         throw new Error('Invalid job ID'); return this.base + '/' + encodeURIComponent(id); }
+}
+/** Adapter keeps existing export provider contracts while root TaskService owns monitoring. */
+function exportTask(provider: ExportJobProvider, initial: ExportJob, request: ExportJobRequest, pollingMs: number) {
+    const latest = signal(initial);
+    const title = `Exporting ${request.resource}`;
+    const snapshot = (job: ExportJob): TaskSnapshot => ({ id: `export-${initial.id}`, title,
+        status: job.status === 'queued' || job.status === 'running' ? 'running' : job.status === 'completed' ? 'completed' : job.status === 'cancelled' ? 'cancelled' : 'failed',
+        percentage: job.percentage, canCancel: job.canCancel, canDownload: job.status === 'completed', canRetry: true,
+        message: job.status === 'expired' ? 'The export file has expired. Request a new job.' : job.status === 'failed' ? 'The backend export failed. Check the outcome before retrying.' : undefined });
+    const publish = (job: ExportJob) => { latest.set(job); return snapshot(job); };
+    const watch = () => timer(0, Math.max(250, pollingMs)).pipe(exhaustMap(() => provider.status(latest().id)), map(parseExportJob), map(publish), takeWhile(job => job.status === 'running', true));
+    const options: TaskOptions = { id: `export-${initial.id}`, title, initial: snapshot(initial), monitoring: true,
+        run: watch, cancel: () => provider.cancel(latest().id).pipe(map(parseExportJob), map(publish)),
+        download: () => provider.download(latest().id).pipe(map(file => ({ ...file, filename: exportFilename(file.filename, request.format) }))),
+        retry: () => provider.start(request).pipe(map(parseExportJob), tap(job => latest.set(job)), switchMap(watch)),
+    };
+    return { latest, options };
 }
 @Component({ selector: 'smart-grid-export-job', imports: [SmartButton, SmartProgressBar], template: `<section class="panel job" aria-label="Backend export job"><h2>Large dataset export</h2><p>Full datasets are prepared by a backend job. No full record set is fetched into the grid.</p><div class="smart-actions"><smart-button label="Request export job" [disabled]="busy() || active()" (pressed)="start()" />@if(job()?.canCancel&&active()){<smart-button label="Cancel export job" [disabled]="busy()" (pressed)="cancel()" />}@if(job()?.status==='completed'){<smart-button label="Download completed job" [disabled]="busy()" (pressed)="download()" />}</div>@if(job()){<smart-progress-bar label="Export job progress" [percentage]="job()?.status === 'completed' ? 100 : job()?.percentage ?? null" [status]="progressStatus()" [text]="job()?.status ?? ''" /><p role="status">Export job: {{ job()?.status }}</p>}@if(failure()){<p role="alert">{{ failure() }}</p>@if(active()){<smart-button label="Retry job status" [disabled]="busy()" (pressed)="poll()" />}}</section>`, styles: `.job { padding:16px; margin-top:16px; }h2 { margin-top:0; }`, changeDetection: ChangeDetectionStrategy.OnPush })
 export class GridExportJobComponent implements OnDestroy {
@@ -59,57 +78,30 @@ export class GridExportJobComponent implements OnDestroy {
     readonly busy = signal(false);
     readonly failure = signal('');
     private readonly errors = inject(ErrorPresenter);
-    private readonly exports = inject(GridExportService);
-    private subscription?: Subscription;
+    private readonly tasks = inject(TaskService);
+    private readonly current = signal<ReturnType<typeof exportTask> | null>(null);
     private command?: Subscription;
-    private version = 0;
-    private format: 'csv' | 'xlsx' = 'csv';
+    private destroyed = false;
+    constructor() { effect(() => {
+        const current = this.current();
+        if (current) {
+            this.job.set(current.latest());
+            this.failure.set(this.tasks.items().find(task => task.id === current.options.id)?.message ?? '');
+        }
+    }); }
     progressStatus(): 'running' | 'success' | 'error' | 'cancelled' { const status = this.job()?.status; return status === 'completed' ? 'success' : status === 'cancelled' ? 'cancelled' : status === 'failed' || status === 'expired' ? 'error' : 'running'; }
     active(): boolean { return this.job()?.status === 'queued' || this.job()?.status === 'running'; }
-    start(): void { if (this.busy() || this.active())
-        return; ++this.version; this.format = this.request().format; this.subscription?.unsubscribe(); this.busy.set(true); this.failure.set(''); const version = this.version; this.command = this.provider().start(this.request()).pipe(map(parseExportJob)).subscribe({ next: job => { if (version !== this.version)
-            return; this.job.set(job); this.busy.set(false); if (this.active())
-            this.poll(); }, error: (error: unknown) => { if (version !== this.version)
-            return; this.failure.set(this.errors.describe(error).message); this.busy.set(false); } }); }
-    poll(): void { const id = this.job()?.id; if (!id || !this.active())
-        return; this.subscription?.unsubscribe(); this.failure.set(''); const version = this.version; this.subscription = timer(0, Math.max(250, this.pollingMs())).pipe(exhaustMap(() => this.provider().status(id)), map(parseExportJob), takeWhile(job => job.status === 'queued' || job.status === 'running', true)).subscribe({ next: job => { if (version !== this.version)
-            return; this.job.set(job); if (job.status === 'failed')
-            this.failure.set('The backend export failed. Check the outcome before requesting another job.'); if (job.status === 'expired')
-            this.failure.set('The export file has expired. Request a new job.'); }, error: (error: unknown) => { if (version === this.version)
-            this.failure.set(this.errors.describe(error).message); } }); }
-    cancel(): void { const job = this.job(); if (!job?.canCancel || !this.active() || this.busy())
-        return; this.busy.set(true); this.subscription?.unsubscribe(); const version = ++this.version; this.command = this.provider().cancel(job.id).pipe(map(parseExportJob)).subscribe({ next: job => { if (version !== this.version)
-            return; this.job.set(job); this.busy.set(false); if (this.active())
-            this.poll(); }, error: (error: unknown) => { if (version !== this.version)
-            return; const message = this.errors.describe(error).message; this.busy.set(false); this.poll(); this.failure.set(message); } }); }
-    download(): void { const job = this.job(); if (!job || job.status !== 'completed' || this.busy())
-        return; this.busy.set(true); const version = this.version; this.command = this.provider().download(job.id).subscribe({ next: file => { if (version !== this.version)
-            return; if (file.expiresAt <= Date.now()) {
-            this.failure.set('The export file has expired. Request a new job.');
-            this.job.set({ ...job, status: 'expired' });
-        }
-        else if (file.blob)
-            this.exports.download(file.blob, exportFilename(file.filename, this.format));
-        else if (file.url) {
-            const url = new URL(file.url, window.location.origin);
-            if (url.origin !== window.location.origin) {
-                this.failure.set('The export download address is not permitted.');
-            }
-            else {
-                const link = document.createElement('a');
-                link.href = url.href;
-                link.download = exportFilename(file.filename, this.format);
-                link.rel = 'noopener';
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            }
-        } this.busy.set(false); }, error: (error: unknown) => { if (version !== this.version)
-            return; if ((error instanceof ApiError && error.status === 410) || (job.expiresAt !== undefined && job.expiresAt <= Date.now())) {
-            this.job.set({ ...job, status: 'expired' });
-            this.failure.set('The export file has expired. Request a new job.');
-        }
-        else
-            this.failure.set(this.errors.describe(error).message); this.busy.set(false); } }); }
-    ngOnDestroy(): void { ++this.version; this.subscription?.unsubscribe(); this.command?.unsubscribe(); }
+    start(): void {
+        if (this.busy() || this.active()) return;
+        this.busy.set(true); this.failure.set('');
+        this.command = this.provider().start(this.request()).pipe(map(parseExportJob)).subscribe({ next: job => {
+            if (this.destroyed) return;
+            const current = exportTask(this.provider(), job, this.request(), this.pollingMs());
+            this.tasks.start(current.options); this.current.set(current); this.job.set(job); this.busy.set(false);
+        }, error: (error: unknown) => { if (!this.destroyed) { this.failure.set(this.errors.describe(error).message); this.busy.set(false); } } });
+    }
+    poll(): void { const id = this.current()?.options.id; if (id) this.tasks.retry(id); }
+    cancel(): void { const id = this.current()?.options.id; if (id) void this.tasks.cancel(id); }
+    download(): void { const id = this.current()?.options.id; if (id) void this.tasks.download(id); }
+    ngOnDestroy(): void { this.destroyed = true; this.command?.unsubscribe(); }
 }

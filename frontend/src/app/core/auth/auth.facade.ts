@@ -1,3 +1,4 @@
+import { DirtyFormsService } from '../feedback/dirty-forms.service';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -9,6 +10,7 @@ export type AuthStatus = 'checking' | 'authenticated' | 'anonymous' | 'unavailab
 export type SessionReason = 'expired' | 'logout' | 'offline';
 @Injectable({ providedIn: 'root' })
 export class AuthFacade {
+  private readonly dirtyForms = inject(DirtyFormsService);
   private readonly provider = inject(AUTH_PROVIDER);
   private readonly router = inject(Router);
   private readonly clock = inject(AUTH_CLOCK);
@@ -106,10 +108,14 @@ export class AuthFacade {
     if (generation === this.generation && this.isAuthenticated()) this.accept(session, started);
   }
   logout(reason: SessionReason = 'logout'): Promise<void> {
+    // Security expiry must never wait behind a voluntary discard confirmation.
+    if (reason !== 'logout') return this.performLogout(reason);
     this.logoutRequest ??= this.performLogout(reason).finally(() => { this.logoutRequest = undefined; });
     return this.logoutRequest;
   }
   private async performLogout(reason: SessionReason): Promise<void> {
+    this.confirmLogout.set(false);
+    if (reason === 'logout' && !(await this.dirtyForms.requestLeave())) return;
     this.signingOut.set(true);
     this.confirmLogout.set(false);
     this.invalidate(reason);
@@ -121,6 +127,7 @@ export class AuthFacade {
     try { await firstValueFrom(this.provider.logout()); this.logoutFailed.set(false); } catch { this.logoutFailed.set(true); }
   }
   invalidate(reason: SessionReason, broadcast = true): void {
+    this.dirtyForms.clear();
     ++this.generation;
     this.provider.clearLocalSession();
     this.current.set(null); this.currentStatus.set('anonymous'); this.refreshing.set(false);

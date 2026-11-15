@@ -6,6 +6,8 @@ This is a working frontend foundation and synthetic sample application, not a co
 | --- | --- | --- |
 | Integration | Authentication, dashboard, notification, administration and export-job production endpoints are contracts | Implement and exercise secure BFF/session/CSRF, ownership/field authorization, error/concurrency and audit behavior with ASP.NET backend |
 | Integration | Million-record exports remain backend contracts with ten-row mock samples | Implement durable authorized jobs, quotas, cancellation, expiry, idempotency and streaming downloads; load-test on backend |
+| Integration | Part 2 task restoration needs a real owner-scoped task-list/retry contract; `TASK_API_CONFIG.endpoint` defaults to null | Configure the shipped adapter or supply `BACKGROUND_TASK_PROVIDER` after implementing the documented [task contract](BACKGROUND_TASK_CONTRACT.md). Existing export monitoring survives navigation but cannot rediscover jobs after refresh through its start/status-only contract |
+| Integration | Upload progress presentation is transport-independent; no file-upload/scan endpoint is supplied | Bind actual HttpClient progress events and server check results to `FileUploadState`, enforce file limits/content checks on the server and wire cancellation to the real transfer |
 | Integration | Coarse application permissions and presentation profiles | Map real employee/team/IAM/system grants, scope personal/team records, validate approval assignment/delegation and separation of duties server-side |
 | Integration | Metadata-only workflow/provisioning configuration examples | Add domain schemas/validation and real designer/engine integration; current UI does not execute provisioning or evaluate policies |
 | Design | Generic record fields and panels differ materially from full business screenshots | Obtain domain data/interaction requirements; implement feature-specific columns/sections without changing the shared screenshot-derived tokens |
@@ -22,3 +24,13 @@ This is a working frontend foundation and synthetic sample application, not a co
 | Tooling | No configured lint script | Add an agreed lint configuration in a focused task; strict TypeScript/templates and executed tests are the current gates |
 
 No critical audit findings were suppressed, no commercial AG Grid feature was introduced, and no push/merge was performed. Backend behavior and manual audit work are not reported as completed frontend tests.
+
+
+### Part 3 form adoption boundary
+
+The reusable SmartForm/DirtyFormsService/DirtyFormGuard lifecycle is implemented and tested. Existing pages were deliberately not migrated during this component-only part. Their legacy callbacks and form copy (including the catalog native-multi-select help sentence) remain until Part 6. New form routes must import SmartForm and register DirtyFormGuard to receive the complete new lifecycle. Browser unload warnings use browser-controlled wording and require a prior user gesture; they are not data persistence. Server validation and authorization remain required.
+
+
+### Part 4 deployment and migration boundary
+
+Footer product/version/environment and links come from APP_METADATA. Privacy, Terms and Help destinations are intentionally unset until deployment supplies approved routes/HTTPS URLs; unavailable items do not navigate to invented documents. The generic table/grid/pager and shared chart-table containment are implemented. Feature-owned read-only summary presentation remains in its module and was reviewed for existing horizontal containment; full feature-page pattern migration remains Part 6. No idle redesign (Part 5) was included.

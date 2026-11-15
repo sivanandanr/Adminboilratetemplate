@@ -11,10 +11,15 @@ import { requiredForPath } from '../core/auth/auth.models';
 import { CanDirective } from '../core/auth/can.directive';
 import { SmartNotificationBell } from '../shared/ui/notifications';
 
+import { SmartRouteProgress } from '../shared/ui/progress';
+import { SmartBreadcrumb } from '../shared/ui/breadcrumb';
+import { SmartAppFooter } from '../shared/ui/app-footer';
+import { SmartOfflineBanner } from '../shared/ui/offline-banner';
+
 type HeaderPopover = 'profile';
 @Component({
   selector: 'iam-admin-shell',
-  imports: [Icon, RouterLink, RouterLinkActive, RouterOutlet, CanDirective, SmartNotificationBell],
+  imports: [Icon, RouterLink, RouterLinkActive, RouterOutlet, CanDirective, SmartNotificationBell, SmartRouteProgress, SmartOfflineBanner, SmartAppFooter, SmartBreadcrumb],
   templateUrl: './admin-shell.html',
   styleUrls: ['./admin-shell.css', './header.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +56,7 @@ export class AdminShell {
     this.destroyRef.onDestroy(() => { this.document.body.style.overflow = originalOverflow; });
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd), takeUntilDestroyed()).subscribe(() => {
       this.updateContext();
+      this.main?.nativeElement.scrollTo({top:0,left:0});
       this.contextReady.set(true);
       this.popover.set(null);
       this.searchMessage.set('');

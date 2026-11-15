@@ -28,17 +28,7 @@
   <div class="workspace" [inert]="mobileOpen()">
     <header class="header">
       <button #menuToggle class="icon-button" aria-label="Toggle navigation" aria-controls="sidebar" [attr.aria-expanded]="mobileOpen() || !collapsed()" (click)="toggleNavigation()"><iam-icon name="Menu" /></button>
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <ol>
-          @for (crumb of breadcrumbs(); track $index) {
-            <li>
-              @if ($index) { <iam-icon name="ChevronRight" [size]="14" /> }
-              @if (crumb.path && !$last) { <a [routerLink]="crumb.path">{{ crumb.label }}</a> }
-              @else { <span [attr.aria-current]="$last ? 'page' : null">{{ crumb.label }}</span> }
-            </li>
-          }
-        </ol>
-      </nav>
+      <smart-breadcrumb class="breadcrumb" appearance="header" [items]="breadcrumbs()" />
       <div class="header-actions">
         <form class="page-search" role="search" aria-label="Find a page" (submit)="findPage($event, pageSearch.value)">
           <iam-icon name="Search" [size]="17" /><input #pageSearch type="search" aria-label="Search pages" placeholder="Search SmartIAM (Ctrl + K)" />
@@ -51,9 +41,12 @@
         </div>
       </div>
     </header>
+    <smart-route-progress />
+    <smart-offline-banner />
     <p class="search-feedback" role="status" [hidden]="!searchMessage()">{{ searchMessage() }}</p>
     @if (auth.permissionsLoading()) { <p class="search-feedback" role="status">Resolving permissions…</p> }
     <main #main id="main-content" tabindex="-1"><router-outlet (activate)="updateContext()" /></main>
+    <smart-app-footer />
   </div>
 </div>
 

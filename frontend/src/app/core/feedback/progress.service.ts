@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-export type ProgressStatus = 'running' | 'success' | 'error' | 'cancelled';
+export type ProgressStatus = 'running' | 'completed' | 'failed' | 'cancelled' | 'success' | 'error';
 export interface ProgressOperation {
     readonly id: number;
     readonly label: string;
@@ -26,7 +26,7 @@ export class ProgressService {
         const percentage = update.completed !== undefined && update.total !== undefined && Number.isFinite(update.completed) && Number.isFinite(update.total) && update.total > 0 && update.completed >= 0 && update.completed <= update.total ? update.completed / update.total * 100 : update.percentage !== undefined && update.percentage !== null && Number.isFinite(update.percentage) && update.percentage >= 0 && update.percentage <= 100 ? update.percentage : null;
         this.operations.update(items => items.map(item => item.id === id && item.status === 'running' ? { ...item, text: update.text ?? item.text, percentage } : item));
     }
-    finish(id: number, status: Exclude<ProgressStatus, 'running'>): void { this.operations.update(items => items.map(item => item.id === id && item.status === 'running' ? { ...item, status, percentage: status === 'success' ? 100 : item.percentage } : item)); }
+    finish(id: number, status: Exclude<ProgressStatus, 'running'>): void { this.operations.update(items => items.map(item => item.id === id && item.status === 'running' ? { ...item, status, percentage: status === 'success' || status === 'completed' ? 100 : item.percentage } : item)); }
     cancel(id: number): void { const item = this.items().find(item => item.id === id); if (!item?.cancel || item.status !== 'running')
         return; try {
         item.cancel();
@@ -43,6 +43,17 @@ export class ProgressService {
         }
         catch { /* Session cleanup must complete even if a consumer cancellation fails. */ }
     } this.operations.set([]); }
+}
+/** Independent request handles prevent an obsolete read from hiding a newer read's bar. */
+@Injectable({ providedIn: 'root' })
+export class DataLoading {
+    private readonly count = signal(0);
+    readonly loading = computed(() => this.count() > 0);
+    begin(): () => void {
+        this.count.update(value => value + 1);
+        let ended = false;
+        return () => { if (!ended) { ended = true; this.count.update(value => Math.max(0, value - 1)); } };
+    }
 }
 @Injectable({ providedIn: 'root' })
 export class RouteProgress {

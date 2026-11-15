@@ -1,12 +1,16 @@
 import { Injectable, signal } from '@angular/core';
 import { FeedbackTone } from './toast.service';
-export type ConfirmationKind = 'confirm' | 'delete' | 'unsaved' | 'logout' | 'privileged';
+import type { ButtonVariant } from '../../shared/button';
+export type ConfirmationKind = 'confirm' | 'approve' | 'reject' | 'delete' | 'remove' | 'withdraw' | 'unsaved' | 'logout' | 'privileged';
 export interface MessageBoxOptions {
     readonly title: string;
-    readonly message: string;
+    readonly message?: string;
+    readonly text?: string;
     readonly tone?: FeedbackTone;
     readonly primaryLabel?: string;
     readonly secondaryLabel?: string;
+    readonly okLabel?: string;
+    readonly okVariant?: ButtonVariant;
 }
 export interface ConfirmationContext {
     readonly reason: string;
@@ -22,6 +26,7 @@ export interface ConfirmOptions extends MessageBoxOptions {
 }
 export interface ConfirmResult {
     readonly confirmed: boolean;
+    readonly ok?: boolean;
     readonly reason?: string;
 }
 export interface DialogRequest {
@@ -37,14 +42,18 @@ export class DialogService {
     readonly requests = this.queue.asReadonly();
     message(options: MessageBoxOptions): Promise<ConfirmResult> { return this.enqueue('message', options); }
     confirm(options: ConfirmOptions): Promise<ConfirmResult> { return this.enqueue('confirm', options); }
+    confirmWithReason(options: ConfirmOptions): Promise<ConfirmResult> { return this.confirm({ ...options, reason: 'required' }); }
+    info(options: MessageBoxOptions): Promise<ConfirmResult> { return this.message({ ...options, tone: 'info' }); }
     private enqueue(type: DialogRequest['type'], options: ConfirmOptions): Promise<ConfirmResult> { return new Promise(resolve => { this.queue.update(items => [...items, { id: ++this.sequence, type, options, resolve }]); }); }
     settle(id: number, result: ConfirmResult): void { const item = this.queue().find(item => item.id === id); if (!item)
-        return; this.queue.update(items => items.filter(item => item.id !== id)); item.resolve(result); }
+        return; this.queue.update(items => items.filter(item => item.id !== id)); item.resolve({ ...result, ok: result.confirmed }); }
     cancelAll(): void { const items = this.queue(); this.queue.set([]); for (const item of items)
-        item.resolve({ confirmed: false }); }
+        item.resolve({ confirmed: false, ok: false }); }
 }
 @Injectable({ providedIn: 'root' })
 export class ConfirmationService {
     constructor(private readonly dialogs: DialogService) { }
     confirm(options: ConfirmOptions): Promise<ConfirmResult> { return this.dialogs.confirm(options); }
+    confirmWithReason(options: ConfirmOptions): Promise<ConfirmResult> { return this.dialogs.confirmWithReason(options); }
+    info(options: MessageBoxOptions): Promise<ConfirmResult> { return this.dialogs.info(options); }
 }
