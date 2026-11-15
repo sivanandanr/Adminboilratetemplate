@@ -1,0 +1,42 @@
+<smart-admin-page [title]="title" [description]="description" [icon]="icon" [kind]="kind" [mock]="provider.mock" [state]="visibleState()" (retried)="refresh()">
+ <div template-actions>
+  <a class="button" [routerLink]="kind==='configuration'?'/administration':base">{{ kind==='configuration'?'Back to Administration':'Back to list' }}</a>
+  @if(!editable && resource!=='audit' && resource!=='access' && resource!=='approvals' && mayWrite()){<a class="button button-primary" [routerLink]="[base,id(),'edit']">Edit record</a>}
+  @if(provider.mock){<label>Page preview<select class="smart-input" aria-label="Page preview state" [value]="preview()" (change)="preview.set($any($event.target).value)"><option value="ready">Ready</option><option value="loading">Loading</option><option value="empty">Empty</option><option value="error">Error</option></select></label>}
+ </div>
+ @if(kind==='wizard'){
+  <smart-wizard [config]="wizardConfig" (stepChanged)="step.set($event)">
+   @if(step()===0){<ng-container [ngTemplateOutlet]="fields" />}
+   @else if(step()===1){<h3>{{ form.controls.name.value }}</h3><p>Owner: {{ form.controls.owner.value }}</p><p>{{ form.controls.description.value }}</p>}
+   @else{<p role="status">Request submitted{{ provider.mock ? ' in memory only' : '' }}. <a [routerLink]="base">View my requests</a></p>}
+   @if(draft()){<p role="status">Draft saved in memory for this page.</p>}
+  </smart-wizard>
+ }@else if(editable){
+  <section class="panel form-panel"><h2>{{ kind==='configuration'?'Configuration':'Basic information' }}</h2><ng-container [ngTemplateOutlet]="fields" />
+   @if(error()){<p role="alert">{{ error() }}</p>}
+   @if(saved()){<p role="status">{{ provider.mock?'Mock configuration saved in memory.':'Changes saved.' }}</p>}
+   <div class="smart-actions"><button iamButton type="button" [disabled]="busy()" (click)="cancel()">Cancel</button><button iamButton type="button" variant="primary" [loading]="busy()" [disabled]="!mayWrite()" (click)="save()">Save changes</button></div>
+  </section>
+ }@else if(state().record; as row){
+  <div class="detail-layout" [class.master]="kind==='master-detail'">
+   @if(kind==='master-detail'){<aside class="panel context" aria-label="Employee master list"><h2>Employees</h2>@if(master().status==='loading'){<p role="status">Loading employees…</p>}@else if(master().status==='error'){<p role="alert">Employee list unavailable. Use the full listing to retry.</p>}@else{<nav aria-label="Select employee">@for(employee of master().items;track employee.id){<a [routerLink]="[base,employee.id]" [attr.aria-current]="employee.id===row.id?'page':null">{{ employee.name }}</a>}@empty{<p>No employees available.</p>}</nav>}<a [routerLink]="base">Browse all employees</a><p>First ten records · selected {{ row.id }}</p></aside>}
+   <section class="panel form-panel"><div class="detail-title"><h2>{{ row.name }}</h2><smart-badge [tone]="row.status==='Approved'||row.status==='Active'?'success':row.status==='Rejected'?'danger':row.status==='Inactive'?'neutral':'warning'">{{ row.status }}</smart-badge></div>
+    <smart-tabs label="Record details" [tabs]="tabs" [active]="tab()" (changed)="tab.set($event)">
+     @switch(tab()){
+      @case('details'){<dl><dt>Record ID</dt><dd>{{ row.id }}</dd><dt>Name</dt><dd>{{ row.name }}</dd><dt>Owner</dt><dd>{{ row.owner }}</dd><dt>Category</dt><dd>{{ row.category }}</dd><dt>Description</dt><dd>{{ row.description }}</dd><dt>Updated</dt><dd>{{ row.updatedAt | date:'medium' }}</dd></dl>}
+      @case('related'){<h3>Related workspaces</h3><p><a routerLink="/applications">Applications</a> · <a routerLink="/accounts">Accounts</a> · <a routerLink="/entitlements">Entitlements</a></p><p>Relationships are not connected to a backend in mock mode.</p>}
+      @case('history'){<h3>Record history</h3><p>{{ row.updatedAt | date:'medium' }} · Snapshot loaded from {{ provider.mock?'memory fixture':'API' }}.</p><p>Detailed change history requires the audit API.</p>}
+     }
+    </smart-tabs>
+    @if(kind==='approval'){<section class="approval"><h3>Approval decision</h3><p>Review the request details before recording a decision.</p><div class="smart-actions"><button iamButton type="button" [disabled]="row.status!=='Pending' || busy() || !mayDecide()" (click)="decide('Rejected')">Reject task</button><button iamButton type="button" variant="primary" [disabled]="row.status!=='Pending' || busy() || !mayDecide()" (click)="decide('Approved')">Approve task</button></div></section>}
+   </section>
+  </div>
+ }
+</smart-admin-page>
+<ng-template #fields><form [formGroup]="form" (submit)="$event.preventDefault()" class="smart-form-grid">
+ <smart-textbox label="Name" formControlName="name" [required]="true" hint="Between 3 and 120 characters." />
+ <smart-textbox label="Owner" formControlName="owner" [required]="true" />
+ <smart-dropdown label="Category" formControlName="category" [options]="categories" [required]="true" />
+ @if(resource!=='requests'){<smart-dropdown label="Status" formControlName="status" [options]="statusOptions" />}
+ <smart-textarea label="Description" formControlName="description" />
+</form></ng-template>

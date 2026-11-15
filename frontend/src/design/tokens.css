@@ -20,6 +20,7 @@
   --iam-control-border: #d7dcfe; /* UI-246 (800,512) */
   --iam-grid-header: #f1f0fd;
   --iam-grid-row: #fbfbfe;
+  --iam-grid-selected: #ede6fd; /* UI-181 selected row region; representative flat fill. */
   --iam-success-fill: #d2f6da;
   --iam-success-text: #005f00;
   --iam-danger-fill: #fee4e6;
@@ -92,6 +93,7 @@
   --iam-primary-soft: #1d2541; /* UI-094 (1000,290) */
   --iam-grid-header: var(--iam-primary-soft);
   --iam-grid-row: var(--iam-surface);
+  --iam-grid-selected: var(--iam-primary-soft); /* P: dark selection mapping. */
   --iam-tile-system: var(--iam-primary-soft);
   --iam-tile-notifications: var(--iam-primary-soft);
   --iam-tile-audit: var(--iam-primary-soft);

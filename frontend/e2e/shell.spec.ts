@@ -5,6 +5,10 @@ import { writeFile } from 'node:fs/promises';
 
 const mainNavigation = (page: Page) => page.getByRole('navigation', { name: 'Main navigation' });
 const loaded = async (page: Page) => {
+  if(new URL(page.url()).pathname === '/dashboard') {
+    await expect(page.locator('smart-dashboard-widget').first()).toBeVisible();
+    return;
+  }
   await expect(page.getByRole('region', { name: 'Administration metrics — mock data' })).toHaveAttribute('aria-busy', 'false');
 };
 const openScenario = async (page: Page, label: string) => {
@@ -90,7 +94,7 @@ test('notification and profile disclosures close and navigate', async ({ page })
   await visitAuthenticated(page, '/administration');
   const bell = page.getByRole('button', { name: 'Notifications', exact: true });
   await bell.click();
-  await expect(page.locator('#notification-panel')).toContainText('not connected');
+  await expect(page.locator('#notification-panel')).toContainText('Mark all as read');
   await page.keyboard.press('Escape');
   await expect(bell).toBeFocused();
   await expect(bell).toHaveAttribute('aria-expanded', 'false');
@@ -103,7 +107,7 @@ test('notification and profile disclosures close and navigate', async ({ page })
   await page.getByRole('link', { name: 'View My Profile' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('My Profile');
   await bell.click();
-  await page.getByRole('link', { name: 'Open notifications placeholder' }).click();
+  await page.getByRole('link', { name: 'View all notifications' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Notifications');
 });
 

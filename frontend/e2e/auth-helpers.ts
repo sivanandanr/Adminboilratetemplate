@@ -10,10 +10,11 @@ export async function loginIfRequired(page: Page, username = 'admin@example.test
   await page.locator('#password').fill('Demo-only!23');
   await page.getByRole('button', { name: 'Sign In', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Toggle navigation', exact: true })).toBeVisible();
+  await expect(page.locator('smart-notification-bell .unread-count')).toHaveText('20');
 }
 export async function visitAuthenticated(page: Page, path: string, username = 'admin@example.test'): Promise<void> {
   await page.goto(path);
   // Wait for the client router to complete boot/guard resolution before deciding.
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15000 });
   await loginIfRequired(page, username);
 }

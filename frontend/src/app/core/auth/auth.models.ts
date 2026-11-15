@@ -38,8 +38,11 @@ export const AUTH_CLOCK = new InjectionToken<() => number>('AUTH_CLOCK', { provi
 
 export function requiredForPath(path: string): readonly Permission[] {
   if (path === '/access-denied') return [];
-  if (path.startsWith('/auth-showcase') || path.startsWith('/dev/components')) return ['showcase.view'];
+  if (path.startsWith('/auth-showcase') || path.startsWith('/dev/')) return ['showcase.view'];
   if (path === '/dashboard' || path === '/administration') return ['dashboard.view'];
+  if (path === '/my-access' || path.startsWith('/my-access/')) return ['dashboard.view'];
+  if (path === '/requests' || path.startsWith('/requests/') || path === '/approvals' || path.startsWith('/approvals/')) return ['dashboard.view'];
+  if (path === '/workflows' || path === '/provisioning/policies') return ['admin.configure'];
   if (path === '/profile' || path === '/notifications') return ['profile.view'];
   if (path === '/administration/system') return ['admin.configure'];
   return ['admin.view'];

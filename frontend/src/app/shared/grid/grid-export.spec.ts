@@ -1,0 +1,27 @@
+import { provideZonelessChangeDetection } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { GridExportService, browserExportLimits, exportFilename, safeCsvText, loadExcelJS } from './grid-export.service';
+import { GridColumn } from './grid.models';
+import { GridPreferencesService } from './grid-preferences.service';
+interface Row {
+    readonly name: string;
+    readonly amount: number;
+    readonly date: Date;
+    readonly secret: string;
+}
+const columns: readonly GridColumn<Row>[] = [{ id: 'name', header: 'Name', kind: 'text', value: row => row.name, export: { allowed: true } }, { id: 'amount', header: 'Amount', kind: 'number', value: row => row.amount, export: { allowed: true } }, { id: 'date', header: 'Date', kind: 'date', value: row => row.date, export: { allowed: true } }, { id: 'secret', header: 'Secret', kind: 'text', value: row => row.secret }];
+const record: Row = { name: '=HYPERLINK("https://example.invalid")', amount: 12.5, date: new Date('2026-01-02T00:00:00Z'), secret: 'sensitive-fixture' };
+describe('Grid export policies and preferences', () => {
+    beforeEach(() => TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] }));
+    it('quotes commas/quotes/newlines and neutralizes formula/control/full-width prefixes', async () => { const service = TestBed.inject(GridExportService); const blob = service.csv({ name: 'Records', rows: [{ ...record, name: 'Name, "quoted"\nnext' }, record], columns, columnIds: ['name', 'amount'] }); const text = await blob.text(); expect(text).toContain('"Name, ""quoted""\nnext"'); expect(text).toContain('\t\'=HYPERLINK'); expect(text).not.toContain('sensitive-fixture'); for (const input of ['=1+1', ' +1', '-1', '@SUM(A1)', '\t=1', '\r=1', '\n=1', '＝1', '＋1', '＠SUM(A1)', '\ufeff=1', '\u200b=1'])
+        expect(safeCsvText(input).startsWith('\t\'')).withContext(input).toBeTrue(); });
+    it('rejects sensitive/unknown columns, object formulas, non-finite numbers and excessive workloads', () => { const service = TestBed.inject(GridExportService); const sheet = { name: 'Records', rows: [record], columns, columnIds: ['secret'] }; expect(() => service.csv(sheet)).toThrow(); expect(() => service.csv({ ...sheet, columnIds: ['unknown'] })).toThrow(); expect(() => service.csv({ ...sheet, columnIds: ['amount'], rows: [{ ...record, amount: Infinity }] })).toThrow(); const unsafe = [{ ...columns[0], value: () => ({ formula: '1+1' }) as unknown as string }]; expect(() => service.csv({ ...sheet, columns: unsafe, columnIds: ['name'] })).toThrow(); expect(() => service.csv({ ...sheet, rows: Array.from({ length: browserExportLimits.rows + 1 }, () => record), columnIds: ['name'] })).toThrow(); });
+    it('generates typed XLSX strings/dates/numbers and configured multiple sheets without formulas', async () => { const service = TestBed.inject(GridExportService); const sheet = { name: 'Records', rows: [record], columns, columnIds: ['name', 'amount', 'date'] }; const blob = await service.xlsx([sheet, { ...sheet, name: 'Applications' }]); const { Workbook, ValueType } = await loadExcelJS(); const workbook = new Workbook(); await workbook.xlsx.load(await blob.arrayBuffer()); expect(workbook.worksheets.length).toBe(2); const row = workbook.worksheets[0].getRow(2); expect(row.getCell(1).type).toBe(ValueType.String); expect(row.getCell(1).value).toBe(record.name); expect(row.getCell(2).value).toBe(12.5); expect(row.getCell(3).value).toEqual(record.date); expect(workbook.worksheets[0].getRow(1).values).not.toContain('Secret'); });
+    it('normalizes download names without accepting paths or formula text as filenames', () => { expect(exportFilename('../bad/name\r\n.csv', 'csv')).not.toMatch(/[\/\\\r\n]/); expect(exportFilename('CON', 'xlsx')).toBe('export-CON.xlsx'); expect(exportFilename('data.xlsx', 'xlsx')).toBe('data.xlsx'); });
+    it('rejects formula objects in headers and resolves colliding worksheet names', async () => { const service = TestBed.inject(GridExportService); const unsafe = [{ ...columns[0], header: { formula: '1+1' } as unknown as string }]; await expectAsync(service.xlsx([{ name: 'Bad', rows: [record], columns: unsafe, columnIds: ['name'] }])).toBeRejected(); const sheet = { rows: [record], columns, columnIds: ['name'] }; const blob = await service.xlsx([{ ...sheet, name: 'X-2' }, { ...sheet, name: 'X' }, { ...sheet, name: 'X' }]); const { Workbook } = await loadExcelJS(); const workbook = new Workbook(); await workbook.xlsx.load(await blob.arrayBuffer()); expect(new Set(workbook.worksheets.map(sheet => sheet.name)).size).toBe(3); });
+    it('stores only layout preferences under a hashed user scope and validates saved IDs', async () => { const service = TestBed.inject(GridPreferencesService); await service.save('test-grid-user', 'unit-grid', { version: 1, pageSize: 25, columns: [{ id: 'name', width: 200, hidden: false }] }); const value = await service.load('test-grid-user', 'unit-grid', ['name'], [10, 25]); expect(value?.columns).toEqual([{ id: 'name', width: 200, hidden: false }]); const other = await service.load('another-grid-user', 'unit-grid', ['name'], [10, 25]); expect(other).toBeNull(); const keys = Object.keys(localStorage).filter(key => key.startsWith('smartiam.grid.v1.')); for (const key of keys) {
+        expect(key).not.toContain('test-grid-user');
+        expect(localStorage.getItem(key)).not.toContain(record.secret);
+        localStorage.removeItem(key);
+    } });
+});

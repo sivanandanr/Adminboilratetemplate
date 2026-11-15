@@ -1,3 +1,19 @@
+# Integrated SmartIAM administration frontend
+
+Start with `/administration` for the existing screenshot-based administration view, `/dashboard` for role profiles, `/identity` for employee records, `/applications`, `/accounts`, `/entitlements`, `/requests`, `/approvals`, `/workflows`, `/provisioning/policies` and `/reporting/logs` for connected mock examples. `/dev/components` is the protected integrated catalog.
+
+See [architecture](docs/ARCHITECTURE.md), [dashboard configuration](docs/DASHBOARD_GUIDE.md), [administration templates](docs/ADMINISTRATION_TEMPLATES.md), [component catalog](docs/COMPONENT_CATALOG.md), [API contracts](docs/BACKEND_ADMINISTRATION_CONTRACT.md), [screenshot comparisons](docs/design/PHASE_6_COMPARISON.md), [quality results](docs/PHASE_6_COMPLETION.md) and [remaining issues](docs/KNOWN_LIMITATIONS.md). Production requires the documented backend. Development fixtures and drafts are memory-only; no IAM operation is claimed complete without corresponding backend behavior.
+
+The phase notes below retain historical implementation context; the Phase 6 report is the current integration status.
+
+# Phase 5 enterprise grid
+
+Development routes: `/dev/grid/client`, `/dev/grid/server`, `/dev/grid/export`, `/dev/grid/selection` (administrator showcase permission). Shared APIs are under `src/app/shared/grid`. See [grid usage, export security, backend contracts, dependency review and verification](docs/PHASE_5_GRID.md). AG Grid Community and lazy ExcelJS are used; no Enterprise license features are required. Large export jobs remain a mock frontend contract until backend integration.
+
+# Phase 4 feedback and interactions
+
+Development routes: `/dev/feedback`, `/dev/wizard`, `/dev/notifications` (administrator showcase permission required). The header bell and `/notifications` now use typed providers. See [Phase 4 API, backend contract, design evidence and verification](docs/PHASE_4_FEEDBACK.md). Production selects the API notification adapter; the mock fixtures and all development showcases are excluded.
+
 # Phase 3 component library
 
 Standalone controls are exported from `src/app/shared/ui`. Start development mode, sign in as the documented administrator, and open `/dev/components` for interactive form states and copyable examples. See [component APIs, design evidence and limitations](docs/PHASE_3_COMPONENTS.md). The showcase is excluded from production.

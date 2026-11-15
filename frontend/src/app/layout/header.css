@@ -10,8 +10,6 @@
 .page-search input { min-width: 0; width: 100%; border: 0; background: transparent; color: var(--iam-text); font-size: var(--iam-font-sm); }
 .page-search input::placeholder { color: var(--iam-text-secondary); opacity: 1; }
 .popover-container { position: relative; }
-.notification-button { position: relative; }
-.notification-dot { position: absolute; width: 6px; height: 6px; background: var(--iam-primary); border-radius: 50%; top: 5px; right: 6px; }
 .profile-trigger { display: flex; align-items: center; gap: 8px; border: 0; padding: 0 4px; min-height: 36px; color: var(--iam-text); background: transparent; border-radius: var(--iam-radius-md); text-align: left; }
 .profile-trigger:hover { background: var(--iam-hover); }
 .avatar { display: grid; place-items: center; width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; color: var(--iam-on-primary); background: var(--iam-primary); font-size: var(--iam-font-xs); font-weight: 600; }

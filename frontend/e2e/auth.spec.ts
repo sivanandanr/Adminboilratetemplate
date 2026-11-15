@@ -37,6 +37,7 @@ test('guards, permission-filtered menus/actions and read-only profile', async ({
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Access denied');
   await expect(page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'System Configuration', exact: true })).toHaveCount(0);
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Dashboard', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard');
   await expect(page.getByRole('link', { name: 'Create Configuration', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: 'My Profile', exact: true }).click(); await page.getByRole('link', { name: 'View My Profile' }).click();
   await expect(page.locator('#profile-displayName')).toBeDisabled();

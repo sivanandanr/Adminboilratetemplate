@@ -9,11 +9,12 @@ import { ThemeService } from './theme.service';
 import { AuthFacade } from '../core/auth/auth.facade';
 import { requiredForPath } from '../core/auth/auth.models';
 import { CanDirective } from '../core/auth/can.directive';
+import { SmartNotificationBell } from '../shared/ui/notifications';
 
-type HeaderPopover = 'notifications' | 'profile';
+type HeaderPopover = 'profile';
 @Component({
   selector: 'iam-admin-shell',
-  imports: [Icon, RouterLink, RouterLinkActive, RouterOutlet, CanDirective],
+  imports: [Icon, RouterLink, RouterLinkActive, RouterOutlet, CanDirective, SmartNotificationBell],
   templateUrl: './admin-shell.html',
   styleUrls: ['./admin-shell.css', './header.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,13 +32,13 @@ export class AdminShell {
   protected readonly mobileOpen = signal(false);
   protected readonly expanded = signal<ReadonlySet<string>>(new Set(['administration']));
   protected readonly currentPath = signal('/administration');
+  protected readonly activeItemPath = computed(() => this.groups().flatMap(group=>group.items).map(item=>item.path).filter(path=>this.currentPath()===path||this.currentPath().startsWith(path+'/')).sort((left,right)=>right.length-left.length)[0]);
   protected readonly breadcrumbs = signal<readonly Breadcrumb[]>([{ label: 'Administration' }]);
   protected readonly popover = signal<HeaderPopover | null>(null);
   protected readonly searchMessage = signal('');
   @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
   @ViewChild('closeMenu') private closeMenu?: ElementRef<HTMLButtonElement>;
   @ViewChild('main') private main?: ElementRef<HTMLElement>;
-  @ViewChild('notificationTrigger') private notificationTrigger?: ElementRef<HTMLButtonElement>;
   @ViewChild('profileTrigger') private profileTrigger?: ElementRef<HTMLButtonElement>;
   @ViewChild('pageSearch') private pageSearch?: ElementRef<HTMLInputElement>;
 
@@ -71,7 +72,7 @@ export class AdminShell {
   }
 
   protected isActive(group: NavigationGroup): boolean {
-    return group.items.some((item) => item.path === this.currentPath());
+    return group.items.some((item) => item.path === this.activeItemPath());
   }
 
   protected toggleGroup(id: string): void {
@@ -126,7 +127,7 @@ export class AdminShell {
   @HostListener('document:keydown.escape') protected onEscape(): void {
     const open = this.popover();
     this.popover.set(null);
-    if (open) this.focusAfterRender(open === 'profile' ? this.profileTrigger : this.notificationTrigger);
+    if (open) this.focusAfterRender(this.profileTrigger);
     this.closeNavigation();
   }
 

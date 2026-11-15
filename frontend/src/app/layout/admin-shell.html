@@ -18,7 +18,7 @@
           </button>
           <div [id]="group.id + '-links'" class="subnav" [hidden]="!expanded().has(group.id) || collapsed()">
             @for (item of group.items; track item.path) {
-              <a [routerLink]="item.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page"><iam-icon [name]="item.icon" [size]="15" /><span>{{ item.label }}</span></a>
+              <a [routerLink]="item.path" [class.active]="item.path===activeItemPath()" [attr.aria-current]="item.path===activeItemPath()?'page':null"><iam-icon [name]="item.icon" [size]="15" /><span>{{ item.label }}</span></a>
             }
           </div>
         </div>
@@ -44,12 +44,7 @@
           <iam-icon name="Search" [size]="17" /><input #pageSearch type="search" aria-label="Search pages" placeholder="Search SmartIAM (Ctrl + K)" />
         </form>
         <button class="icon-button" [attr.aria-label]="theme.theme() === 'light' ? 'Switch to dark theme' : 'Switch to light theme'" (click)="theme.toggle()"><iam-icon [name]="theme.theme() === 'light' ? 'Moon' : 'Sun'" /></button>
-        <div class="popover-container" data-header-popover>
-          <button #notificationTrigger class="icon-button notification-button" aria-label="Notifications" aria-controls="notification-panel" [attr.aria-expanded]="popover() === 'notifications'" (click)="togglePopover('notifications')"><iam-icon name="Bell" /><span class="notification-dot" aria-hidden="true"></span></button>
-          <section id="notification-panel" class="header-popover" [hidden]="popover() !== 'notifications'" aria-labelledby="notification-title">
-            <h2 id="notification-title">Notifications</h2><p>Notification service is not connected.</p><a *iamCan="'profile.view'" routerLink="/notifications">Open notifications placeholder <iam-icon name="ArrowRight" [size]="15" /></a>
-          </section>
-        </div>
+        <smart-notification-bell *iamCan="'profile.view'" (opened)="popover.set(null)" />
         <div class="popover-container" data-header-popover>
           <button #profileTrigger class="profile-trigger" aria-label="My Profile" aria-controls="profile-panel" [attr.aria-expanded]="popover() === 'profile'" (click)="togglePopover('profile')"><span class="avatar" aria-hidden="true">{{ auth.initials() }}</span><span class="profile-copy"><strong>{{ auth.user()?.displayName }}</strong><small>{{ auth.user()?.provider === 'mock' ? 'Development session' : auth.user()?.provider }}</small></span><iam-icon name="ChevronDown" [size]="14" /></button>
           <section id="profile-panel" class="header-popover" [hidden]="popover() !== 'profile'" aria-labelledby="profile-title"><h2 id="profile-title">My Profile</h2><p>{{ auth.user()?.username }}</p><a *iamCan="'profile.view'" routerLink="/profile"><iam-icon name="UserRound" [size]="16" />View My Profile</a><button class="button" [disabled]="auth.permissionsLoading()" (click)="auth.revalidate()">Refresh permissions</button><button class="button" (click)="popover.set(null); auth.confirmLogout.set(true)">Logout</button></section>

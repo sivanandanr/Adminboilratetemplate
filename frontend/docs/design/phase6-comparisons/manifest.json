@@ -1,0 +1,153 @@
+[
+  {
+    "name": "administration",
+    "path": "/administration",
+    "reference": "UI-246",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "employee-dashboard",
+    "path": "/dashboard",
+    "reference": "UI-204",
+    "width": 1672,
+    "height": 941,
+    "role": "employee"
+  },
+  {
+    "name": "manager-dashboard",
+    "path": "/dashboard",
+    "reference": "UI-204",
+    "width": 1672,
+    "height": 941,
+    "role": "manager"
+  },
+  {
+    "name": "iam-dashboard",
+    "path": "/dashboard",
+    "reference": "UI-204",
+    "width": 1672,
+    "height": 941,
+    "role": "iam"
+  },
+  {
+    "name": "system-dashboard",
+    "path": "/dashboard",
+    "reference": "UI-204",
+    "width": 1672,
+    "height": 941,
+    "role": "system"
+  },
+  {
+    "name": "employees",
+    "path": "/identity",
+    "reference": "UI-181",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "employee-details",
+    "path": "/identity/EMP0001",
+    "reference": "UI-181",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "employee-create",
+    "path": "/identity/new",
+    "reference": "UI-037",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "employee-edit",
+    "path": "/identity/EMP0001/edit",
+    "reference": "UI-037",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "applications",
+    "path": "/applications",
+    "reference": "UI-006",
+    "width": 1752,
+    "height": 897
+  },
+  {
+    "name": "application-details",
+    "path": "/applications/APP0001",
+    "reference": "UI-152",
+    "width": 1536,
+    "height": 1024
+  },
+  {
+    "name": "accounts",
+    "path": "/accounts",
+    "reference": "UI-063",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "account-details",
+    "path": "/accounts/ACC0001",
+    "reference": "UI-049",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "entitlements",
+    "path": "/entitlements",
+    "reference": "UI-203",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "requests",
+    "path": "/requests",
+    "reference": "UI-151",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "request-wizard",
+    "path": "/requests/new",
+    "reference": "UI-007",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "approvals",
+    "path": "/approvals",
+    "reference": "UI-098",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "approval-details",
+    "path": "/approvals/APP0001",
+    "reference": "UI-171",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "workflow-configuration",
+    "path": "/workflows",
+    "reference": "UI-037",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "provisioning-policy",
+    "path": "/provisioning/policies",
+    "reference": "UI-198",
+    "width": 1672,
+    "height": 941
+  },
+  {
+    "name": "audit",
+    "path": "/reporting/logs",
+    "reference": "UI-117",
+    "width": 1672,
+    "height": 941
+  }
+]

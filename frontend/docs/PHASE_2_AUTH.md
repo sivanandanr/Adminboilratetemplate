@@ -1,5 +1,7 @@
 # Phase 2 — Authentication and session management
 
+Phase 6 integration note: `dashboard.view` also exposes personal My Requests, My Access and read-only approval tasks. Recording approval decisions still requires `admin.view`; administrative create/edit/configuration requires `admin.configure`. These are coarse frontend grants; real ownership, assignment and team scopes must be enforced by the backend. The original Phase 2 verification below is historical; current integrated results are in [Phase 6](PHASE_6_COMPLETION.md).
+
 ## Run the development application
 
 From `frontend`, run `npm.cmd start` and open `/login`. The Angular development configuration selects the isolated mock adapter. Public, disposable **development-only** examples:

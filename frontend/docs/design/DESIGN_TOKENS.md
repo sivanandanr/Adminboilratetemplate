@@ -159,3 +159,15 @@ Preserve the measured alternatives in this document. Settle the inconsistencies 
 ## Phase 3 component realization
 
 The component library consumes the existing centralized CSS palette and geometry. `--iam-error-text` is a provisional semantic alias of `--iam-text-secondary`; it does not introduce another sampled RGB. Error panels use the existing UI-181 danger tint, UI-007 danger accent and UI-246 navy text for readable feedback; danger buttons also retain navy text in dark mode. Status meaning/interaction normalization is still provisional. Regular fields use the existing 36px height and 6px radius; native date/select/file chrome varies by platform. See [Phase 3 APIs and verification](../PHASE_3_COMPONENTS.md) for the reference mapping, interaction limits and results. No additional Tailwind palette was introduced.
+
+## Phase 4 interaction realization
+
+Toasts, confirmation/message dialogs, notification panels, progress and wizard navigation reuse the existing surface, semantic tint, primary, text, border, radius and spacing variables. No new RGB palette is introduced. UI-244 supplies wizard structure/progress evidence only; its blue primary is excluded from the purple administration theme. Fixed toast position/animation, modal width, focus/keyboard behavior and mobile step stacking are provisional choices because static images do not establish those interactions. See [Phase 4 API and verification](../PHASE_4_FEEDBACK.md) for dimensions, limitations and source-reference comparisons.
+
+## Phase 5 grid mapping
+
+The Community grid maps existing grid-header/row/text/border/control/primary variables through AG Grid's Theming API, with identical odd/even row fills. `--iam-grid-selected: #EDE6FD` realizes the already-measured UI-181 selected-row sample (see Grid and form tokens above); its dark mapping to primary-soft remains provisional. Checkbox interaction colors reuse existing text/control/primary/on-primary variables. Row/header heights, popup geometry and mobile scrolling are normalized/provisional; source images do not prove CSS declarations or keyboard behavior. See [Phase 5 grid documentation](../PHASE_5_GRID.md) for source comparisons and verification. No new generic color palette was introduced.
+
+## Phase 6 composition
+
+Dashboard widgets, trend content, listing summaries, page templates and the integrated catalog reuse the existing palette and spacing/radius/shadow tokens. No new sampled color or Tailwind palette is introduced. Simple chart bars use the existing primary token; category labels and a data table communicate values without relying on color. Numbered pagination uses the existing primary/on-primary current-page treatment, supported by UI-246/UI-181/UI-006. Dashboard three-column support layouts, mock preview controls, generic forms and responsive compositions are normalized, provisional geometry. See the [actual capture/difference review](PHASE_6_COMPARISON.md); the results do not establish pixel-perfect equivalence.

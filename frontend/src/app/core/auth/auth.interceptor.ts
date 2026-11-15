@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, retry, throwError, timeout, timer } from 'rxjs';
+import { TimeoutError, catchError, retry, throwError, timeout, timer } from 'rxjs';
 import { AUTH_CONFIG } from './auth.config';
 import { AuthFacade } from './auth.facade';
 import { ApiError, ApiErrorKind } from './api-error';
@@ -23,8 +23,8 @@ export const AuthInterceptor: HttpInterceptorFn = (request, next) => {
         if (status === 401 && auth.isAuthenticated()) auth.invalidate('expired');
         if (status === 403 && auth.isAuthenticated()) void router.navigateByUrl('/access-denied');
       }
-      const kind: ApiErrorKind = status === 0 ? 'network' : status === 401 ? 'unauthorized' : status === 403 ? 'forbidden' : status === 400 || status === 422 ? 'validation' : 'server';
-      const message = { network: 'Unable to reach the service. Check your connection.', unauthorized: 'Sign-in failed or the session has expired.', forbidden: 'Access to this operation is denied.', validation: 'The service rejected the submitted values.', server: 'The service is temporarily unavailable.' }[kind];
+      const kind: ApiErrorKind = error instanceof TimeoutError ? 'timeout' : status === 0 ? 'network' : status === 401 ? 'unauthorized' : status === 403 ? 'forbidden' : status === 400 || status === 422 ? 'validation' : 'server';
+      const message = { timeout: 'The service did not respond in time.', network: 'Unable to reach the service. Check your connection.', unauthorized: 'Sign-in failed or the session has expired.', forbidden: 'Access to this operation is denied.', validation: 'The service rejected the submitted values.', server: 'The service is temporarily unavailable.' }[kind];
       return throwError(() => new ApiError(status, kind, message, correlation));
     }),
   );

@@ -51,6 +51,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
     { label: 'Entitlement Hierarchy', path: '/entitlements/hierarchy', icon: 'Network' },
   ] },
   { id: 'requests', label: 'Access Requests', icon: 'FileSearch', items: [
+    { label: 'My Access', path: '/my-access', icon: 'KeyRound' },
     { label: 'My Requests', path: '/requests', icon: 'FileSearch' },
     { label: 'Request Access', path: '/requests/new', icon: 'Plus' },
   ] },
@@ -63,6 +64,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
     { label: 'Workflow Instances', path: '/workflows/instances', icon: 'Activity' },
   ] },
   { id: 'provisioning', label: 'Provisioning Management', icon: 'Settings', items: [
+    { label: 'Provisioning Policies', path: '/provisioning/policies', icon: 'Settings' },
     { label: 'Provisioning Operations', path: '/provisioning', icon: 'Settings' },
     { label: 'Provisioning Jobs', path: '/provisioning/jobs', icon: 'CalendarDays' },
   ] },

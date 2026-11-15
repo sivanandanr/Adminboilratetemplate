@@ -19,6 +19,7 @@ export interface KpiMetric {
         <strong class="value" [class.skeleton]="loading()">{{ loading() ? '—' : metric().value }}</strong>
         <h2>{{ metric().label }}</h2>
         <p>{{ loading() ? 'Loading…' : metric().detail }}</p>
+        <ng-content />
       </div>
     </article>
   `,

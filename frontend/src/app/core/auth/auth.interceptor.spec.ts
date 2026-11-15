@@ -23,6 +23,19 @@ describe('AuthInterceptor and BFF adapter', () => {
     spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true); spyOn(TestBed.inject(Router), 'navigateByUrl').and.resolveTo(true);
   });
   afterEach(() => { backend.verify(); document.cookie = 'XSRF-TOKEN=; Max-Age=0; Path=/'; });
+  it('classifies request timeouts without retrying a mutation', () => {
+    jasmine.clock().install();
+    try {
+      const failed = jasmine.createSpy('failed');
+      http.post('/api/timed-operation', {}).subscribe({ error: failed });
+      const request = backend.expectOne('/api/timed-operation');
+      jasmine.clock().tick(10_001);
+      expect(request.cancelled).toBeTrue();
+      expect(failed).toHaveBeenCalledTimes(1);
+      expect((failed.calls.mostRecent().args[0] as ApiError).kind).toBe('timeout');
+      backend.expectNone('/api/timed-operation');
+    } finally { jasmine.clock().uninstall(); }
+  });
   it('adds correlation, credentials and CSRF to BFF mutations only', () => {
     document.cookie = 'XSRF-TOKEN=csrf-example; Path=/';
     http.post('/api/profile', {}).subscribe();
