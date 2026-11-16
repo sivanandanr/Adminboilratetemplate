@@ -98,6 +98,10 @@ Other matches: `features/dev/demo-utils.ts` is an isolated abortable delay utili
 
 See `ui-patterns-plan.md` and `ui-patterns-addon-plan.md` for the other two prompts' Step 0 deliverables. Add-on implementation remains after the main pattern work as instructed; its audit does not authorize starting it now.
 
+### Revised Part 6 disposition
+
+The user cancelled business-page changes and requested a UI Patterns component showcase instead. `/ui-patterns` now composes the existing Parts 1–4 controls and root services; the existing component catalog links to it. The audited business-page migration rows remain deferred, not resolved. No shared public API was changed. The only shared styling correction is theme-aware outlined success-button contrast, discovered by the new showcase axe checks. See [the acceptance review](ui-components-part6-acceptance.md) for changed files, executed checks, visual evidence and the remaining Part 5/backend/deployment prerequisites.
+
 ## Compatibility and decisions to review before implementation
 
 - Preserve `ToastService.show`, ProgressService and status success/error, dialog results `{confirmed, reason}`, current option names and all barrel exports. New prompt APIs should be adapters/aliases, not replacements.

@@ -14,6 +14,10 @@ describe('Shared form field policy',()=>{
   const fixture=TestBed.createComponent(FormExample); fixture.detectChanges(); await fixture.whenStable(); const host=fixture.nativeElement as HTMLElement; const input=host.querySelector('input')!;
   input.dispatchEvent(new Event('blur')); fixture.detectChanges(); expect(host.querySelector('[role=alert]')).toBeNull();
   host.querySelector('form')!.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true})); await fixture.whenStable(); expect(input.getAttribute('aria-invalid')).toBe('true');
+  const error=host.querySelector<HTMLElement>('[role=alert]')!;
+  expect(error.querySelector('iam-icon')).not.toBeNull();
+  expect(error.querySelector('span')?.textContent).toContain('This field is required.');
+  expect(input.getAttribute('aria-describedby')?.split(' ')).toContain(error.id);
   input.value='ab'; input.dispatchEvent(new Event('input')); await fixture.whenStable(); expect(host.textContent).toContain('Enter at least 3 characters.');
   input.value='Valid'; input.dispatchEvent(new Event('input')); await fixture.whenStable(); expect(host.querySelector('[role=alert]')).toBeNull();
   fixture.componentInstance.form.reset(); await fixture.whenStable(); expect(host.querySelector('[role=alert]')).toBeNull();

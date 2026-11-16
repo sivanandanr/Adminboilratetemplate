@@ -13,6 +13,9 @@ describe('SmartAutocomplete asynchronous and keyboard behavior',()=>{
  beforeEach(()=>TestBed.configureTestingModule({providers:[provideZonelessChangeDetection()]}));
  async function setup() { const fixture=TestBed.createComponent(AutocompleteExample); fixture.detectChanges(); await fixture.whenStable(); const input=(fixture.nativeElement as HTMLElement).querySelector('input')!; return {fixture,model:fixture.componentInstance,input,host:fixture.nativeElement as HTMLElement}; }
  async function search(input:HTMLInputElement,value:string) { input.value=value; input.dispatchEvent(new Event('input')); await new Promise(resolve=>setTimeout(resolve,15)); }
+ it('keeps its search affordance decorative and its clear action labelled',async()=>{
+  const {host,input}=await setup();expect(host.querySelector('.search-icon lucide-icon')?.getAttribute('aria-hidden')).toBe('true');expect(input.getAttribute('role')).toBe('combobox');expect(host.querySelector('button')?.getAttribute('aria-label')).toBe('Clear User');
+ });
  it('honors minimum length and cancels stale requests so old responses cannot win',async()=>{
   const {fixture,model,input,host}=await setup(); await search(input,'a'); expect(model.requests.length).toBe(0); await search(input,'alpha'); expect(model.requests.length).toBe(1); await search(input,'beta'); expect(model.requests[0].cancelled).toBeTrue(); model.requests[0].source.next({items:[{value:'old',label:'Old'}]}); model.requests[1].source.next({items:[{value:'new',label:'New'}]}); fixture.detectChanges(); expect(host.textContent).not.toContain('Old'); expect(host.querySelector('[role=option]')?.textContent).toContain('New'); fixture.destroy(); expect(model.requests[1].cancelled).toBeTrue();
  });

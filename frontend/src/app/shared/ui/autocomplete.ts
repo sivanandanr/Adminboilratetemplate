@@ -3,6 +3,7 @@ import { Observable, of, switchMap, timer } from 'rxjs';
 import { SmartValueAccessor } from './value-accessor';
 import { SmartFormField } from './form-field';
 import { Button } from '../button';
+import { Icon } from '../icon';
 
 export interface SmartSearchRequest { readonly query: string; readonly limit: number; readonly cursor?: string; }
 export interface SmartSearchResult<T> { readonly items: readonly T[]; readonly nextCursor?: string; }
@@ -10,9 +11,9 @@ export interface SmartSearchResult<T> { readonly items: readonly T[]; readonly n
 export interface SmartDataProvider<T> { search(request: SmartSearchRequest): Observable<SmartSearchResult<T>>; }
 export interface SmartOption { readonly value: string; readonly label: string; readonly disabled?: boolean; }
 
-@Component({ selector: 'smart-autocomplete', imports: [SmartFormField, Button], hostDirectives: [{ directive: SmartValueAccessor, inputs: ['id', 'label', 'placeholder', 'hint', 'required', 'disabled', 'disabledReason', 'validationMode', 'readonly', 'errors'] }], template: `
+@Component({ selector: 'smart-autocomplete', imports: [SmartFormField, Button, Icon], hostDirectives: [{ directive: SmartValueAccessor, inputs: ['id', 'label', 'placeholder', 'hint', 'required', 'disabled', 'disabledReason', 'validationMode', 'readonly', 'errors'] }], template: `
  <smart-form-field [disabled]="field.isDisabled()" [disabledReason]="field.disabledReason()" [forId]="field.id()" [label]="field.label()" [hint]="field.hint()" [required]="field.required()" [errors]="field.messages()">
- <div class="autocomplete" (keydown.escape)="close()"><div class="smart-input-row"><input class="smart-input" role="combobox" autocomplete="off" [id]="field.id()" [attr.aria-expanded]="expanded()" [attr.aria-controls]="field.id() + '-list'" aria-autocomplete="list" aria-haspopup="listbox" [attr.aria-activedescendant]="expanded() && active() >= 0 ? field.id() + '-option-' + active() : null" [attr.aria-describedby]="field.describedBy()" [attr.aria-invalid]="field.invalid()" [attr.aria-required]="field.required()" [disabled]="field.isDisabled()" [readonly]="field.readonly()" [placeholder]="field.placeholder()" [value]="text()" (input)="search($event)" (focus)="open()" (keydown)="keydown($event)" (blur)="blur()" />
+ <div class="autocomplete" (keydown.escape)="close()"><div class="smart-input-row"><div class="search-entry"><iam-icon class="search-icon" name="Search" [size]="16" /><input class="smart-input" role="combobox" autocomplete="off" [id]="field.id()" [attr.aria-expanded]="expanded()" [attr.aria-controls]="field.id() + '-list'" aria-autocomplete="list" aria-haspopup="listbox" [attr.aria-activedescendant]="expanded() && active() >= 0 ? field.id() + '-option-' + active() : null" [attr.aria-describedby]="field.describedBy()" [attr.aria-invalid]="field.invalid()" [attr.aria-required]="field.required()" [disabled]="field.isDisabled()" [readonly]="field.readonly()" [placeholder]="field.placeholder()" [value]="text()" (input)="search($event)" (focus)="open()" (keydown)="keydown($event)" (blur)="blur()" /></div>
  <button iamButton type="button" [disabled]="field.isDisabled() || field.readonly()" [attr.aria-label]="'Clear ' + field.label()" (click)="clear()">Clear</button></div>
  @if (multiple()) { <div role="group" [attr.aria-label]="field.label() + ' selected values'">@for (value of selected(); track value) { <span class="smart-chip">{{ labelFor(value) }}<button type="button" class="icon-button" [disabled]="field.isDisabled() || field.readonly()" [attr.aria-label]="'Remove ' + labelFor(value)" (click)="remove(value)">×</button></span> }</div> }
  @if (expanded()) { <div class="smart-popover"><ul role="listbox" [id]="field.id() + '-list'" [attr.aria-label]="field.label() + ' suggestions'" [attr.aria-multiselectable]="multiple() || null" [attr.aria-busy]="loading()">
@@ -23,7 +24,7 @@ export interface SmartOption { readonly value: string; readonly label: string; r
  @else if (!results().length) { <p role="status">No results found.</p> }
  @if (nextCursor() && !loading() && results().length < 100) { <button iamButton type="button" (click)="loadMore()">Load more suggestions</button> }
  @if (results().length >= 100) { <p role="status">Refine your search to see more results.</p> }</div> }
- </div></smart-form-field>`, styles: `.autocomplete { position:relative; }ul { list-style:none; padding:0; margin:0; }p { padding:8px; margin:0; }`, changeDetection: ChangeDetectionStrategy.OnPush })
+ </div></smart-form-field>`, styles: `.autocomplete { position:relative; }.search-entry { position:relative; min-width:0; flex:1; }.search-entry input { padding-left:34px; }.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); pointer-events:none; color:var(--iam-text-secondary); }ul { list-style:none; padding:0; margin:0; }p { padding:8px; margin:0; }`, changeDetection: ChangeDetectionStrategy.OnPush })
 export class SmartAutocomplete<T extends object = SmartOption> {
  readonly field = inject<SmartValueAccessor<string | readonly string[]>>(SmartValueAccessor);
  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);

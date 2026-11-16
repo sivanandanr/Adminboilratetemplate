@@ -247,7 +247,7 @@ Part 3 stops here. Adopting the new lifecycle in existing pages and replacing th
 
 ### Shell and footer
 
-At desktop widths (768px and up), AdminShell owns a 100dvh column: header, loading/offline feedback, a single scrolling main area, and the footer. Sidebar navigation scrolls independently. The footer occupies only the content column and follows collapsed navigation width. Mobile preserves document scrolling and puts the wrapping footer at the end. Successful route navigation resets the content scroller; declined navigation retains its position. The existing root application outlets remain singletons across sign-in and authenticated routes: AuthDialogs, DialogHost, ToastContainer, BlockUi and authenticated BackgroundTasks. Loading and offline outlets remain mounted once in AdminShell. The idle design is unchanged pending Part 5.
+At every viewport width, AdminShell owns a 100dvh column: header, loading/offline feedback, a single scrolling main area, and the footer. Sidebar navigation scrolls independently. The footer occupies only the content column and follows collapsed navigation width. On phones the footer wraps inside the same fixed-height column and stays visible; the document does not scroll. Main establishes the containing block for absolute accessibility labels, so long forms cannot create a second body scrollbar. Successful route navigation resets the content scroller; declined navigation retains its position. The existing root application outlets remain singletons across sign-in and authenticated routes: AuthDialogs, DialogHost, ToastContainer, BlockUi and authenticated BackgroundTasks. Loading and offline outlets remain mounted once in AdminShell. The idle design is unchanged pending Part 5.
 
 `SmartAppFooter` renders the current year and `APP_METADATA` configuration. Override the token at deployment:
 
@@ -347,3 +347,57 @@ Part 4 verification completed on 2026-11-16:
 - git diff --check passed. No dependency or feature-page source changes, commit, push or merge were made. Existing user changes from earlier parts remain intact.
 
 Deployment still needs approved Privacy/Terms/Help destinations in APP_METADATA. Feature-page migrations/demo remain Part 6. Part 4 stops here; Part 5 idle timeout work has not started.
+
+## UI Patterns showcase (revised Part 6 scope)
+
+Open **Component Library → Open UI Patterns**, or `/ui-patterns`, in a development build with `showcase.view`. The route is lazy loaded and permission guarded; production has no showcase route, fixture provider or interceptor. The user explicitly cancelled business-page migrations. Existing profile, workflow and record pages remain unchanged.
+
+The development sidebar also exposes **Administration → UI Patterns**. It uses the existing permission filter and active-route styling; users without `showcase.view` do not see the link. Production navigation omits it.
+
+The Forms section starts with **Searchable autocomplete**: single and multiple selection, a search icon, labelled Clear, two-character search, `*` browsing, five-result pages, keyboard selection and removable chips. The twelve names are synthetic local demo data. The same `SmartAutocomplete` supports remote providers; the showcase does not add another search implementation.
+
+The sample request groups fields into Request details, Access period, and Owners and confirmation. Descriptions explain each group, long text spans the grid, and the existing form footer keeps Save/Cancel and dirty feedback together. Shared field errors use a decorative alert icon with readable text below the field, existing semantic error tokens, and the existing aria-describedby/aria-invalid connections. Errors still appear on submission and update on correction; the required-reason dialog retains its reference text-only presentation.
+
+The five sections compose the existing components rather than implementing new feedback or form behavior:
+
+| Section | Examples and shared APIs |
+|---|---|
+| Actions and feedback | `SmartButton` variants/action confirmations, disabledReason/loading, `SmartButtonGroup`, ToastService four tones, DialogService.confirm/confirmWithReason/info, SmartModal |
+| Progress and tasks | Automatic write interception through requestFeedback, quick/unknown/slow/failure/read responses, BlockUiService.run with confirmed steps, TaskService cancellation/retry/download, SmartFileUpload byte counts/checking/errors, ConnectionService banner, local overlay/skeleton/spinner/progress |
+| Forms and unsaved changes | Typed Reactive Forms, all shared field types, submit validation, SmartForm, SmartActionToolbar, guarded tabs/routes, immediate confirmed toggle |
+| Tables and selection | SmartTable with sticky header and contained scrolling, existing GridPaginationComponent in tablePager projection |
+| Containers and status | SmartDrawer with guarded SmartForm, SmartAccordionGroup single mode, SmartBreadcrumb current item, SmartStatusBadge five tones and risk |
+
+Usage examples for the individual inputs remain in the sections above. The runnable composition is `src/app/features/dev/ui-patterns.html`; its TypeScript owns only demo values, work callbacks and outcomes. Global feedback/session/task outlets remain mounted once in the shell. No new public component API, library or parallel pattern implementation was added.
+
+Demo work is isolated in UiPatternsDemoProvider and UiPatternsDemoInterceptor. A save validates and stores a local revision before confirming stages. Background jobs create 500 synthetic rows in confirmed batches; export downloads those rows, retry reruns a failed attempt, and cancellation waits for acknowledgement. Local CSV checks count actual bytes read, then check basic structure without a checking percentage. Nothing is uploaded; CSV parsing, authorization and durable jobs require backend adapters. Jobs survive Angular route changes through the existing root service, but local fixtures cannot survive a hard refresh.
+
+```ts
+const context = requestFeedback({ title: 'Saving your changes' });
+// The showcase uses only /api/ui-patterns-demo/* fixture endpoints.
+await firstValueFrom(http.post('/api/ui-patterns-demo/unknown', {}, { context }));
+```
+
+```html
+<form smartForm #state="smartForm" [formGroup]="draft">
+  <smart-textbox label="Request name" formControlName="name" [required]="true" />
+  <smart-action-toolbar placement="form" [form]="state" (closed)="resetDraft()">
+    <smart-button primaryAction type="submit" label="Save" icon="Check" variant="primary" />
+  </smart-action-toolbar>
+</form>
+```
+
+The showcase freezes native fields with a disabled fieldset during saving; state.save owns dirty clearing and protects edits made during an asynchronous save. The immediate toggle uses confirmChange and commits only after its callback succeeds. Do not put credentials into the password example.
+
+The idle card reuses AuthDialogPreview and the existing session engine. The opt-in `/ui-patterns?idleDemo=1` reloads development configuration with a 30-second idle limit and 15-second warning. Restore normal timing reloads without the flag. This demonstrates current behavior; it does not claim the unimplemented Part 5 shared-modal/progress design is complete.
+
+An accessibility fix discovered by the showcase maps the outlined success button to the existing theme-aware completed-text token. Light styling and the solid success fill remain as before; dark outlined success text is now readable.
+
+See [Part 6 acceptance review](ui-components-part6-acceptance.md) for scope, verification and prerequisite gaps.
+
+
+### Fixed footer and advanced grid follow-up
+
+The footer remains outside the main content scroller at phone, tablet and desktop widths. Its space is reserved by flex layout rather than overlaying the last controls. The sidebar may scroll independently, and grids keep their own row/horizontal scrolling; there is only one page-content scroller and no document scrollbar. Modal/drawer body scrolling remains scoped to those components.
+
+UI Patterns now includes **Advanced data grid**, composing SmartDataGridComponent with 1,000 deterministic synthetic employees. It reuses shared search, column filters, sort, selection, column preferences, pager, CSV/XLSX exports and a shared read-only details drawer. Its fixture is bounded and development-only, and preferences use the current user's scope. No new grid implementation or business-page code was added.

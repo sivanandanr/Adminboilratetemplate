@@ -15,7 +15,7 @@
 .subnav a.active, .nav-row.active { background: var(--iam-sidebar-active); font-weight: 600; }
 .section-active > .group-trigger { background: var(--iam-primary); }
 .workspace { margin-left: var(--navigation-width); min-height: 100dvh; }
-main { padding: var(--iam-space-3) var(--iam-space-4) var(--iam-space-4); min-width: 0; }
+main { position:relative; padding: var(--iam-space-3) var(--iam-space-4) var(--iam-space-4); min-width: 0; }
 main:focus { outline: none; }
 main:focus-visible { outline: 3px solid var(--iam-focus); outline-offset: -3px; }
 .collapsed { --navigation-width: var(--iam-sidebar-collapsed-width); }
@@ -40,13 +40,11 @@ main:focus-visible { outline: 3px solid var(--iam-focus); outline-offset: -3px; 
   .collapsed .nav-row { justify-content: flex-start; }
 }
 
-/* Desktop scroll ownership: header/footer remain outside the only content scroller. */
-@media(min-width:768px){
+/* Viewport scroll ownership at every size: only main content scrolls. */
  :host,.shell{height:100dvh;min-height:0;overflow:hidden;}
  .workspace{height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
  .header,smart-offline-banner,.search-feedback{flex-shrink:0;}
  main{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;}
-}
 .sidebar{z-index:var(--iam-layer-navigation);}
 .backdrop{z-index:var(--iam-layer-navigation-backdrop);}
 .header{position:relative;z-index:var(--iam-layer-header);}

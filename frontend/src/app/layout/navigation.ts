@@ -1,5 +1,6 @@
 import { IconName } from '../shared/icon';
 import { Permission } from '../core/auth/auth.models';
+import { environment } from '../../environments/environment';
 
 export interface NavigationItem {
   readonly label: string;
@@ -30,6 +31,7 @@ export const administrationNavigation: readonly NavigationItem[] = [
   { label: 'Master Data', path: '/administration/master-data', icon: 'Layers' },
   { label: 'Email Configuration', path: '/administration/email', icon: 'Inbox' },
   { label: 'System Health', path: '/administration/health', icon: 'Activity' },
+  ...(!environment.production ? [{ label: 'UI Patterns', path: '/ui-patterns', icon: 'Layers' as const }] : []),
 ];
 
 // UI-246 module order; child labels are supported by Phase 1A's screen catalogue.

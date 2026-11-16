@@ -6,7 +6,7 @@ smart-textbox, smart-password, smart-textarea, smart-number-input, smart-dropdow
 .smart-input[readonly], .smart-input[aria-readonly='true'] { background:var(--iam-surface); }
 .smart-input:disabled { opacity:.55; cursor:not-allowed; }
 .smart-hint { font-size:var(--iam-font-xs); color:var(--iam-text-secondary); margin:4px 0 0; }
-.smart-errors { color:var(--iam-error-text); font-size:var(--iam-font-xs); }.smart-errors p { margin:4px 0 0; padding:4px 8px; border-left:3px solid var(--iam-icon-danger); background:var(--iam-danger-fill); color:var(--iam-sidebar); }
+.smart-errors { color:var(--iam-feedback-danger-text); font-size:var(--iam-font-xs); }.smart-errors p { display:flex; align-items:flex-start; gap:var(--iam-space-1); margin:var(--iam-space-2) 0 0; padding:0; line-height:1.5; color:inherit; }
 .smart-input-row { display:flex; align-items:center; gap:var(--iam-space-2); }.smart-input-row>.smart-input { min-width:0; flex:1; }
 .smart-section { border:1px solid var(--iam-border); border-radius:var(--iam-radius-lg); background:var(--iam-surface); padding:var(--iam-space-4); min-width:0; }.smart-section > legend { font-size:var(--iam-font-lg); font-weight:700; padding:0 8px; }
 .smart-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--iam-space-4); }
@@ -32,7 +32,7 @@ smart-textbox, smart-password, smart-textarea, smart-number-input, smart-dropdow
 .button[aria-disabled=true] { cursor:not-allowed; opacity:.55; }
 .button.button-danger { background:var(--iam-secondary-fill); color:var(--iam-feedback-danger-text); border-color:var(--iam-feedback-danger); }
 .button.button-danger.button-solid { background:var(--iam-feedback-danger); color:var(--iam-feedback-on-danger); border-color:var(--iam-feedback-danger); }
-.button.button-success { background:var(--iam-secondary-fill); border-color:var(--iam-success-text); color:var(--iam-success-text); }
+.button.button-success { background:var(--iam-secondary-fill); border-color:var(--iam-progress-completed-text); color:var(--iam-progress-completed-text); }
 .button.button-success.button-solid { background:var(--iam-success-text); color:var(--iam-on-primary); }
 .button.button-warning { background:var(--iam-secondary-fill); border-color:var(--iam-icon-notifications); color:var(--iam-text-secondary); }
 .button.button-warning.button-solid { background:var(--iam-warning-fill); color:var(--iam-text-secondary); }
@@ -54,6 +54,7 @@ smart-confirm-dialog .reason-field label { color:var(--iam-feedback-title); font
 smart-confirm-dialog .reason-field .smart-input { display:block; height:90px; min-height:90px; border:1px solid var(--iam-feedback-border); border-radius:var(--iam-radius-lg); background:var(--iam-feedback-surface); color:var(--iam-feedback-title); }
 smart-confirm-dialog .reason-field textarea:focus-visible { outline:2px solid var(--iam-focus); outline-offset:2px; }
 smart-confirm-dialog .reason-field .smart-errors p { margin:8px 0 0; padding:0; border:0; background:transparent; color:var(--iam-feedback-danger-text); font-size:var(--iam-font-xs); line-height:17px; }
+smart-confirm-dialog .reason-field .smart-errors iam-icon { display:none; }
 smart-confirm-dialog .dialog-error { color:var(--iam-feedback-danger-text); font-size:var(--iam-font-sm); margin:8px 0 0; }
 smart-confirm-dialog smart-textbox { margin-top:var(--iam-space-4); }
 smart-confirm-dialog .smart-actions, smart-message-box .smart-actions { gap:10px; margin:0; }
