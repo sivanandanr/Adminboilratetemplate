@@ -30,3 +30,25 @@ export * from './dialogs';
 export * from './progress';
 export * from './notifications';
 export * from './wizard';
+
+export * from './feedback-icon';
+export { DialogService, ConfirmationService } from '../../core/feedback/dialog.service';
+export type { ConfirmOptions, ConfirmResult, MessageBoxOptions } from '../../core/feedback/dialog.service';
+export { ToastService } from '../../core/feedback/toast.service';
+export type { ToastOptions, ToastItem, FeedbackTone } from '../../core/feedback/toast.service';
+export { ButtonGroupState } from '../button';
+export type { ButtonVariant, ButtonEmphasis } from '../button';
+
+export * from './block-ui';
+export * from './offline-banner';
+export * from './tasks';
+export { REQUEST_FEEDBACK, requestFeedback } from '../../core/feedback/request-feedback-context';
+export type { RequestFeedbackOptions } from '../../core/feedback/request-feedback-context';
+export { ApiTaskProvider, TASK_API_CONFIG } from '../../core/feedback/task.provider';
+export type { TaskApiConfig } from '../../core/feedback/task.provider';
+
+export * from './forms';
+export { DirtyFormGuard } from '../../core/feedback/dirty-form.guard';
+
+export * from './app-footer';
+export * from './table';

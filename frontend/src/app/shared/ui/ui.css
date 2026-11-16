@@ -6,7 +6,7 @@ smart-textbox, smart-password, smart-textarea, smart-number-input, smart-dropdow
 .smart-input[readonly], .smart-input[aria-readonly='true'] { background:var(--iam-surface); }
 .smart-input:disabled { opacity:.55; cursor:not-allowed; }
 .smart-hint { font-size:var(--iam-font-xs); color:var(--iam-text-secondary); margin:4px 0 0; }
-.smart-errors { color:var(--iam-error-text); font-size:var(--iam-font-xs); }.smart-errors p { margin:4px 0 0; padding:4px 8px; border-left:3px solid var(--iam-icon-danger); background:var(--iam-danger-fill); color:var(--iam-sidebar); }
+.smart-errors { color:var(--iam-feedback-danger-text); font-size:var(--iam-font-xs); }.smart-errors p { display:flex; align-items:flex-start; gap:var(--iam-space-1); margin:var(--iam-space-2) 0 0; padding:0; line-height:1.5; color:inherit; }
 .smart-input-row { display:flex; align-items:center; gap:var(--iam-space-2); }.smart-input-row>.smart-input { min-width:0; flex:1; }
 .smart-section { border:1px solid var(--iam-border); border-radius:var(--iam-radius-lg); background:var(--iam-surface); padding:var(--iam-space-4); min-width:0; }.smart-section > legend { font-size:var(--iam-font-lg); font-weight:700; padding:0 8px; }
 .smart-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--iam-space-4); }
@@ -21,3 +21,59 @@ smart-textbox, smart-password, smart-textarea, smart-number-input, smart-dropdow
 .button.button-outline { background:transparent; color:var(--iam-accent); border-color:var(--iam-accent); }.button.button-ghost { background:transparent; box-shadow:none; border-color:transparent; }.button.button-danger { background:var(--iam-danger-fill); color:var(--iam-sidebar); border-color:var(--iam-icon-danger); }.button.button-small { min-height:30px; padding:4px 8px; }.button.button-large { min-height:42px; padding:8px 18px; }
 .smart-tablist { display:flex; overflow-x:auto; border-bottom:1px solid var(--iam-border); gap:8px; }.smart-tab { flex-shrink:0; min-height:42px; padding:8px 12px; background:transparent; border:0; border-bottom:3px solid transparent; color:var(--iam-text); }.smart-tab[aria-selected='true'] { color:var(--iam-accent); border-bottom-color:var(--iam-accent); font-weight:600; }
 @media(max-width:767px) { .smart-form-grid { grid-template-columns:1fr; } }
+
+/* Part 1: semantic actions extend existing geometry and palette. */
+.button { position:relative; }
+.button-content { display:inline-flex; align-items:center; justify-content:center; gap:var(--iam-space-2); }
+.button-content.busy { visibility:hidden; }
+.button-spinner { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.button-spinner svg { animation:button-spin .8s linear infinite; }
+@keyframes button-spin { to { transform:rotate(360deg); } }
+.button[aria-disabled=true] { cursor:not-allowed; opacity:.55; }
+.button.button-danger { background:var(--iam-secondary-fill); color:var(--iam-feedback-danger-text); border-color:var(--iam-feedback-danger); }
+.button.button-danger.button-solid { background:var(--iam-feedback-danger); color:var(--iam-feedback-on-danger); border-color:var(--iam-feedback-danger); }
+.button.button-success { background:var(--iam-secondary-fill); border-color:var(--iam-progress-completed-text); color:var(--iam-progress-completed-text); }
+.button.button-success.button-solid { background:var(--iam-success-text); color:var(--iam-on-primary); }
+.button.button-warning { background:var(--iam-secondary-fill); border-color:var(--iam-icon-notifications); color:var(--iam-text-secondary); }
+.button.button-warning.button-solid { background:var(--iam-warning-fill); color:var(--iam-text-secondary); }
+.action-toolbar { justify-content:space-between; }
+.action-status { display:flex; gap:var(--iam-space-2); align-items:center; }
+.action-status:empty { display:none; }
+.action-buttons { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:var(--iam-space-2); margin-left:auto; }
+.unsaved-pill { display:inline-flex; align-items:center; gap:var(--iam-space-1); border-radius:var(--iam-radius-lg); padding:var(--iam-space-1) var(--iam-space-2); background:var(--iam-warning-fill); color:var(--iam-text-secondary); font-size:var(--iam-font-xs); }
+@media(max-width:760px) { .action-status { flex-basis:100%; } }
+@media(prefers-reduced-motion:reduce) { .button-spinner svg { animation:none; } }
+
+/* Native directive consumers get the same non-reflowing busy indicator. */
+.button[aria-busy=true]:not(:has(.button-spinner)) { color:transparent; }
+.button[aria-busy=true]:not(:has(.button-spinner))::after { content:''; position:absolute; width:16px; height:16px; left:calc(50% - 8px); top:calc(50% - 8px); border:2px solid var(--iam-control-border); border-top-color:var(--iam-accent); border-radius:50%; animation:button-spin .8s linear infinite; }
+@media(prefers-reduced-motion:reduce) { .button[aria-busy=true]::after { animation:none !important; } }
+
+/* Screenshot-aligned confirmation composition; generic form controls remain unchanged. */
+smart-confirm-dialog .reason-field label { color:var(--iam-feedback-title); font-size:var(--iam-font-sm); line-height:16px; margin-bottom:6px; }
+smart-confirm-dialog .reason-field .smart-input { display:block; height:90px; min-height:90px; border:1px solid var(--iam-feedback-border); border-radius:var(--iam-radius-lg); background:var(--iam-feedback-surface); color:var(--iam-feedback-title); }
+smart-confirm-dialog .reason-field textarea:focus-visible { outline:2px solid var(--iam-focus); outline-offset:2px; }
+smart-confirm-dialog .reason-field .smart-errors p { margin:8px 0 0; padding:0; border:0; background:transparent; color:var(--iam-feedback-danger-text); font-size:var(--iam-font-xs); line-height:17px; }
+smart-confirm-dialog .reason-field .smart-errors iam-icon { display:none; }
+smart-confirm-dialog .dialog-error { color:var(--iam-feedback-danger-text); font-size:var(--iam-font-sm); margin:8px 0 0; }
+smart-confirm-dialog smart-textbox { margin-top:var(--iam-space-4); }
+smart-confirm-dialog .smart-actions, smart-message-box .smart-actions { gap:10px; margin:0; }
+smart-confirm-dialog .button, smart-message-box .button { min-height:40px; border-radius:var(--iam-radius-lg); padding:8px 16px; font-size:var(--iam-font-md); box-shadow:none; }
+smart-confirm-dialog .button:not(.button-solid), smart-message-box .button:not(.button-solid) { background:var(--iam-feedback-surface); border-color:var(--iam-feedback-border); color:var(--iam-feedback-title); font-weight:500; }
+smart-confirm-dialog .button.button-danger.button-solid { background:var(--iam-feedback-danger); border-color:var(--iam-feedback-danger); color:var(--iam-feedback-on-danger); }
+
+smart-confirm-dialog .reason-field smart-field-error { display:block; }
+
+/* Tables scroll inside their shared card; header and pager belong to that card. */
+smart-table table{width:100%;border-collapse:separate;border-spacing:0;}
+smart-table thead th{position:sticky;top:0;background:var(--iam-surface);z-index:var(--iam-layer-sticky);}
+smart-table th,smart-table td{padding:var(--iam-space-2);text-align:left;border-bottom:1px solid var(--iam-border);}
+smart-table [tablePager]{display:block;padding:var(--iam-space-2);border-top:1px solid var(--iam-border);}
+
+/* Form footers remain scoped to their form; domain pages adopt this slot in Part 6. */
+smart-action-toolbar.form-footer{display:block;position:sticky;bottom:var(--iam-tasks-clearance);z-index:var(--iam-layer-sticky);background:var(--iam-surface);margin-top:var(--iam-space-4);}
+.form-footer>.smart-actions[data-placement='form']{margin-top:0;padding:var(--iam-space-2) 0;border-top:1px solid var(--iam-border);}
+.smart-input,.smart-choice input,smart-toggle button{scroll-margin-bottom:var(--iam-form-footer-clearance);}
+
+smart-drawer footer .form-footer{position:static;margin:0;background:transparent;}
+smart-drawer footer .form-footer>.smart-actions[data-placement='form']{padding:0;border:0;}

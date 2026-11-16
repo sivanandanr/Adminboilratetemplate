@@ -1,3 +1,4 @@
+import { requestFeedback } from '../../core/feedback/request-feedback-context';
 import { HttpClient } from '@angular/common/http';
 import { Observable, defer, map, of } from 'rxjs';
 import { GridCapabilities, GridColumn, GridDataSource, GridFilter, GridPage, GridRequest, GridValue, validateGridPage, validateGridRequest } from './grid.models';
@@ -30,7 +31,7 @@ export class ServerGridDataSource<T> implements GridDataSource<T> {
     readonly mode = 'server' as const;
     constructor(private readonly http: HttpClient, private readonly endpoint: string, readonly capabilities: GridCapabilities, private readonly decode: (value: unknown) => T) { if (!endpoint.startsWith('/') || endpoint.startsWith('//') || endpoint.includes('\\'))
         throw new Error('A same-origin API path is required'); }
-    load(request: GridRequest): Observable<GridPage<T>> { return defer(() => { validateGridRequest(request, this.capabilities); return this.http.post<unknown>(this.endpoint, request).pipe(map(value => { if (!value || typeof value !== 'object')
+    load(request: GridRequest): Observable<GridPage<T>> { return defer(() => { validateGridRequest(request, this.capabilities); return this.http.post<unknown>(this.endpoint, request, { context: requestFeedback({ mode: 'read' }) }).pipe(map(value => { if (!value || typeof value !== 'object')
         throw new Error('Invalid page response'); const page = value as Record<string, unknown>; if (!Array.isArray(page['items']))
         throw new Error('Invalid page items'); return validateGridPage({ items: page['items'].map(this.decode), totalCount: page['totalCount'] as number | null, pageNumber: page['pageNumber'] as number, pageSize: page['pageSize'] as number, hasNextPage: page['hasNextPage'] as boolean | undefined }, request); })); }); }
 }

@@ -11,6 +11,7 @@ export interface PresentedError {
 @Injectable({ providedIn: 'root' })
 export class ErrorPresenter {
     private readonly toasts = inject(ToastService);
+    private readonly presented = new WeakSet<object>();
     describe(error: unknown): PresentedError {
         if (error instanceof ApiError) {
             const titles = { validation: 'Validation failed', unauthorized: 'Sign-in required', forbidden: 'Access denied', network: 'Connection problem', server: 'Service unavailable', timeout: 'Operation timed out' };
@@ -19,7 +20,9 @@ export class ErrorPresenter {
         }
         return { title: 'Unexpected application error', message: 'The operation could not be completed. Try again or reload the page.' };
     }
-    present(error: unknown): void { const value = this.describe(error); this.toasts.show({ tone: 'error', title: value.title, message: value.message + (value.correlationId ? ` Reference: ${value.correlationId}` : '') }); }
+    present(error: unknown, override?: PresentedError): void {
+        if (error !== null && typeof error === 'object') { if (this.presented.has(error)) return; this.presented.add(error); }
+        const value = override ?? this.describe(error); this.toasts.show({ tone: 'error', title: value.title, message: value.message + (value.correlationId ? ` Reference: ${value.correlationId}` : '') }); }
 }
 @Injectable()
 export class SafeApplicationErrorHandler implements ErrorHandler {

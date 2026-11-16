@@ -2,6 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { Icon } from './icon';
 describe('Icon', () => {
+  it('renders the reference feedback glyphs from the existing Lucide registry', () => {
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    const fixture = TestBed.createComponent(Icon);
+    for (const name of ['Check', 'Trash2', 'Info', 'TriangleAlert']) {
+      fixture.componentRef.setInput('name', name); fixture.detectChanges();
+      expect((fixture.nativeElement as HTMLElement).querySelector('svg')).not.toBeNull();
+    }
+  });
   it('renders a decorative SVG with the configured size', () => {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(Icon);

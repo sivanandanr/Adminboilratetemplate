@@ -1,3 +1,4 @@
+import { Icon } from '../../shared/icon';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Button } from '../../shared/button';
@@ -9,8 +10,8 @@ import { NotificationsShowcase } from './notifications-showcase';
 import { WizardShowcase } from './wizard-showcase';
 import { GridShowcase } from './grid/grid-showcase';
 
-@Component({selector:'iam-component-catalog',imports:[RouterLink,Button,DashboardWidgetComponent,AdminPageTemplate,FeedbackShowcase,NotificationsShowcase,WizardShowcase,GridShowcase],template:`
- <section class="panel catalog" aria-labelledby="catalog-title"><h2 id="catalog-title">Enterprise component catalog</h2>
+@Component({selector:'iam-component-catalog',imports:[RouterLink,Button,Icon,DashboardWidgetComponent,AdminPageTemplate,FeedbackShowcase,NotificationsShowcase,WizardShowcase,GridShowcase],template:`
+ <section class="panel catalog" aria-labelledby="catalog-title"><div class="catalog-heading"><h2 id="catalog-title">Enterprise component catalog</h2><a class="patterns-link" routerLink="/ui-patterns"><iam-icon name="Layers" [size]="16" />Open UI Patterns</a></div>
  <nav aria-label="Component categories">@for(category of categories;track category){<button iamButton type="button" [attr.aria-pressed]="selected()===category" (click)="selected.set(category)">{{ category }}</button>}</nav>
  <p class="note">Controls below use the central design tokens. Form state controls and API examples remain available beneath this catalog.</p>
  <dl><dt>Keyboard and accessibility</dt><dd>{{ notes() }}</dd><dt>Design tokens</dt><dd><code>--iam-surface, --iam-text, --iam-primary, --iam-border, --iam-space-*, --iam-focus</code>; screenshot references UI-246 / UI-181 / UI-037. New interaction geometry is provisional.</dd><dt>Typed API usage</dt><dd><pre>{{ api() }}</pre></dd></dl>
@@ -26,7 +27,7 @@ import { GridShowcase } from './grid/grid-showcase';
  @case('Navigation and layout'){<p>The application shell demonstrates nested navigation, breadcrumbs, theme controls, a responsive drawer and permission-filtered menus.</p><a routerLink="/administration">Open administration layout</a>}
  @default{<p>Interactive {{ selected().toLowerCase() }} examples and variants follow below. Use the State explorer for required, disabled, read-only, loading and error states.</p>}
  }
- </section>`,styles:`.catalog { padding:16px; margin-bottom:16px; }h2 { margin:0 0 12px; }nav { display:flex; gap:8px; flex-wrap:wrap; }button[aria-pressed=true] { border-color:var(--iam-accent); color:var(--iam-accent); }dt { font-weight:600; margin-top:8px; }dd { margin:4px 0 12px; overflow-wrap:anywhere; }pre { white-space:pre-wrap; overflow-wrap:anywhere; margin:0; }label { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0; }select { max-width:240px; }.note { color:var(--iam-text-secondary); }smart-dashboard-widget { display:block; max-width:480px; margin-bottom:12px; }`,changeDetection:ChangeDetectionStrategy.OnPush})
+ </section>`,styles:`.catalog-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--iam-space-2); margin-bottom:12px; }.catalog-heading h2 { margin:0; }.patterns-link { display:inline-flex; align-items:center; gap:var(--iam-space-2); min-height:24px; }.catalog { padding:16px; margin-bottom:16px; }h2 { margin:0 0 12px; }nav { display:flex; gap:8px; flex-wrap:wrap; }button[aria-pressed=true] { border-color:var(--iam-accent); color:var(--iam-accent); }dt { font-weight:600; margin-top:8px; }dd { margin:4px 0 12px; overflow-wrap:anywhere; }pre { white-space:pre-wrap; overflow-wrap:anywhere; margin:0; }label { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0; }select { max-width:240px; }.note { color:var(--iam-text-secondary); }smart-dashboard-widget { display:block; max-width:480px; margin-bottom:12px; }`,changeDetection:ChangeDetectionStrategy.OnPush})
 export class ComponentCatalog {
  readonly categories=['Navigation and layout','Buttons','Forms','Autocomplete and selection','Date controls','Dialogs','Toasts','Notifications','Progress indicators','Wizards','Data grids','Dashboard widgets','Administration templates'] as const;
  readonly selected=signal<string>('Forms');

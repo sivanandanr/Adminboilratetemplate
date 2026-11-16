@@ -1,9 +1,9 @@
 import { Directive, ElementRef, HostListener, OnDestroy, Renderer2, inject, input } from '@angular/core';
 let nextTooltip = 0;
-/** Text-only hoverable, dismissible tooltip. Attach to a focusable trigger. */
-@Directive({ selector: '[smartTooltip]' })
+/** Text-only tooltip. Button composes this directive and exposes the same input; exclude its selector to prevent duplicate matching. */
+@Directive({ selector: '[smartTooltip]:not([iamButton])' })
 export class SmartTooltip implements OnDestroy {
- readonly smartTooltip = input.required<string>();
+ readonly smartTooltip = input('');
  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
  private readonly renderer = inject(Renderer2);
  private readonly id = `smart-tooltip-${++nextTooltip}`;
@@ -16,10 +16,13 @@ export class SmartTooltip implements OnDestroy {
  @HostListener('focusin') focus(): void { this.focused = true; this.show(); }
  @HostListener('mouseleave') leave(): void { this.hovered = false; this.scheduleHide(); }
  @HostListener('focusout') blur(): void { this.focused = false; this.scheduleHide(); }
+ private fallback: (() => string) | undefined;
+ setFallback(value: () => string): void { this.fallback = value; }
+ private text(): string { return this.smartTooltip() || this.fallback?.() || ''; }
  private show(): void {
-  clearTimeout(this.timer); if (this.tooltip || !this.smartTooltip()) return;
+  clearTimeout(this.timer); if (this.tooltip || !this.text()) return;
   const trigger = this.trigger(); const tip = this.renderer.createElement('span') as HTMLElement;
-  tip.id = this.id; tip.role = 'tooltip'; tip.textContent = this.smartTooltip();
+  tip.id = this.id; tip.role = 'tooltip'; tip.textContent = this.text();
   Object.assign(tip.style, { position:'fixed', zIndex:'100', maxWidth:'min(280px, calc(100vw - 16px))', padding:'8px', border:'1px solid var(--iam-control-border)', borderRadius:'var(--iam-radius-md)', background:'var(--iam-surface)', color:'var(--iam-text)', boxShadow:'var(--iam-shadow)' });
   this.renderer.appendChild(document.body, tip);
   this.oldDescription = trigger.getAttribute('aria-describedby'); trigger.setAttribute('aria-describedby', [this.oldDescription, this.id].filter(Boolean).join(' ')); this.tooltip = tip; this.position();

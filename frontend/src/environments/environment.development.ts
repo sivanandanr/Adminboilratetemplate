@@ -1,3 +1,4 @@
+import { UiPatternsDemoInterceptor } from '../app/features/dev/ui-patterns-demo.interceptor';
 import { MockGridHttpInterceptor } from '../app/features/dev/grid/mock-grid-api';
 import { MockRoleDashboardProvider } from '../app/features/dev/mock-role-dashboard.provider';
 import { MockRecordsProvider } from '../app/features/dev/mock-records.provider';
@@ -11,12 +12,14 @@ import { UnsavedChangesGuard } from '../app/shared/ui/wizard';
 // A dev/test-only runtime hook. The production replacement has no such hook/import.
 const overrides = (globalThis as { __SMARTIAM_MOCK_CONFIG__?: { idleTimeoutMs?: number; warningMs?: number; mockLifetimeMs?: number } }).__SMARTIAM_MOCK_CONFIG__;
 const duration = (value: number | undefined, fallback: number) => value !== undefined && Number.isFinite(value) && value >= 1000 ? value : fallback;
-const idleTimeoutMs = duration(overrides?.idleTimeoutMs, 5 * 60_000);
+const patternIdleDemo=typeof location!=='undefined' && new URLSearchParams(location.search).get('idleDemo')==='1' && location.pathname==='/ui-patterns';
+const idleTimeoutMs = duration(overrides?.idleTimeoutMs, patternIdleDemo ? 30_000 : 5 * 60_000);
 const auth: AuthConfig = { ...productionAuthConfig, mode: 'mock', providers: ['mock'], rememberUsername: true,
-  idleTimeoutMs, warningMs: Math.min(duration(overrides?.warningMs, 30_000), idleTimeoutMs - 500), mockLifetimeMs: duration(overrides?.mockLifetimeMs, 15 * 60_000),
+  idleTimeoutMs, warningMs: Math.min(duration(overrides?.warningMs, patternIdleDemo ? 15_000 : 30_000), idleTimeoutMs - 500), mockLifetimeMs: duration(overrides?.mockLifetimeMs, 15 * 60_000),
 };
-export const environment = { production: false, auth, createAuthProvider: () => inject(MockAuthProvider), createNotificationProvider: () => inject(MockNotificationProvider), createDashboardProvider:()=>inject(MockRoleDashboardProvider),createRecordsProvider:()=>inject(MockRecordsProvider), developmentInterceptors: [MockGridHttpInterceptor] };
+export const environment = { production: false, auth, createAuthProvider: () => inject(MockAuthProvider), createNotificationProvider: () => inject(MockNotificationProvider), createDashboardProvider:()=>inject(MockRoleDashboardProvider),createRecordsProvider:()=>inject(MockRecordsProvider), developmentInterceptors: [MockGridHttpInterceptor, UiPatternsDemoInterceptor] };
 export const developmentRoutes: Routes = [
+ {path:'ui-patterns',title:'UI Patterns | SmartIAM',canDeactivate:[UnsavedChangesGuard],data:{label:'UI Patterns',icon:'Layers',permissions:['showcase.view'],breadcrumbs:[{label:'UI Patterns'}]},loadComponent:()=>import('../app/features/dev/ui-patterns').then(m=>m.UiPatterns)},
  ...(['client','server','export','selection'] as const).map(gridMode=>({path:'dev/grid/'+gridMode,title:'Enterprise Grid | SmartIAM',data:{label:'Enterprise Grid',icon:'Users',permissions:['showcase.view'],breadcrumbs:[{label:'Enterprise Grid'}],gridMode},loadComponent:()=>import('../app/features/dev/grid/grid-showcase').then(m=>m.GridShowcase)})),
 
  {path:'dev/feedback',title:'Feedback Showcase | SmartIAM',data:{label:'Feedback Showcase',icon:'Bell',permissions:['showcase.view'],breadcrumbs:[{label:'Feedback Showcase'}]},loadComponent:()=>import('../app/features/dev/feedback-showcase').then(m=>m.FeedbackShowcase)},

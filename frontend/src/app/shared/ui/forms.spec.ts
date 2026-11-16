@@ -23,6 +23,14 @@ class FormExample {
 describe('Smart form controls', () => {
  beforeEach(() => TestBed.configureTestingModule({providers:[provideZonelessChangeDetection()]}));
  function setup() { const fixture = TestBed.createComponent(FormExample); fixture.detectChanges(); return { fixture, model:fixture.componentInstance, host:fixture.nativeElement as HTMLElement }; }
+ it('uses the shared wrapper for every control and keeps all disabled controls unavailable', async () => {
+  const {fixture,model,host}=setup();
+  const names=['textbox','textarea','password','number-input','dropdown','multi-select','checkbox','radio-group','toggle','date-picker','date-range-picker','file-upload'];
+  for(const name of names) expect(host.querySelector(`smart-${name} smart-form-field`)).withContext(name).not.toBeNull();
+  for(const control of [model.name,model.number,model.role,model.roles,model.accepted,model.enabled,model.range,model.files,model.password,model.description,model.date]) control.disable();
+  await fixture.whenStable();
+  for(const input of Array.from(host.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('input,select,textarea'))) expect(input.disabled).withContext(input.outerHTML).toBeTrue();
+ });
  it('integrates textbox model writes, edits, reset, touched and disabled without echoing changes', () => {
   const {fixture,model,host} = setup(); const input = host.querySelector<HTMLInputElement>('smart-textbox input')!; const changes = jasmine.createSpy(); model.name.valueChanges.subscribe(changes);
   model.name.setValue('Server'); fixture.detectChanges(); expect(input.value).toBe('Server'); expect(changes).toHaveBeenCalledTimes(1);
@@ -46,8 +54,8 @@ describe('Smart form controls', () => {
   const arrow=new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true,cancelable:true}); select.dispatchEvent(arrow); expect(arrow.defaultPrevented).toBeTrue();
  });
  it('integrates dropdown, multiple selection and radios with typed values', () => {
-  const {model,host}=setup(); const select=host.querySelector<HTMLSelectElement>('smart-dropdown select')!; select.value='b'; select.dispatchEvent(new Event('change')); expect(model.role.value).toBe('b');
-  const multiple=host.querySelector<HTMLSelectElement>('smart-multi-select select')!; multiple.options[0].selected=true; multiple.options[1].selected=true; multiple.dispatchEvent(new Event('change')); expect(model.roles.value).toEqual(['a','b']);
+  const {fixture,model,host}=setup(); const select=host.querySelector<HTMLSelectElement>('smart-dropdown select')!; select.value='b'; select.dispatchEvent(new Event('change')); expect(model.role.value).toBe('b');
+  const multiple=fixture.debugElement.queryAll(node => node.componentInstance instanceof SmartMultiSelect)[0].componentInstance as SmartMultiSelect; multiple.change(['a','b']); expect(model.roles.value).toEqual(['a','b']);
   host.querySelectorAll<HTMLInputElement>('smart-radio-group input')[0].click(); expect(model.role.value).toBe('a');
  });
  it('confirms toggles before emitting and ignores rejected confirmations', async () => {
@@ -62,7 +70,7 @@ describe('Smart form controls', () => {
  it('rejects file type/size and accepts files without uploading', () => {
   const {fixture,model,host}=setup(); const input=host.querySelector<HTMLInputElement>('smart-file-upload input')!;
   function files(file:File) { Object.defineProperty(input,'files',{configurable:true,value:[file]}); input.dispatchEvent(new Event('change')); fixture.detectChanges(); }
-  files(new File(['bad'],'test.exe')); expect(model.files.value).toEqual([]); expect(host.querySelector('smart-file-upload')!.textContent).toContain('not accepted');
+  files(new File(['bad'],'test.exe')); expect(model.files.value).toEqual([]); expect(host.querySelector('smart-file-upload')!.textContent).toContain('Choose a supported file type');
   files(new File(['much too long a file'],'test.txt')); expect(model.files.value).toEqual([]);
   const file=new File(['ok'],'test.txt'); files(file); expect(model.files.value).toEqual([file]); host.querySelector<HTMLButtonElement>('smart-file-upload button')!.click(); expect(model.files.value).toEqual([]);
  });

@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, computed, effect, inject, input, output, signal } from '@angular/core';
-import { CanDeactivateFn } from '@angular/router';
+export { UnsavedChangesGuard } from '../../core/feedback/dirty-form.guard';
+import type { UnsavedAware } from '../../core/feedback/dirty-form.guard';
+export type { UnsavedAware } from '../../core/feedback/dirty-form.guard';
 import { ConfirmationService } from '../../core/feedback/dialog.service';
 import { Button } from '../button';
 import { SmartProgressBar } from './progress';
@@ -19,10 +21,6 @@ export interface WizardConfiguration {
     readonly saveDraft?: () => Promise<void>;
     readonly dirty?: () => boolean;
 }
-export interface UnsavedAware {
-    requestLeave(): Promise<boolean>;
-}
-export const UnsavedChangesGuard: CanDeactivateFn<UnsavedAware> = component => component.requestLeave();
 @Component({ selector: 'smart-stepper', template: `<nav [attr.aria-label]="label()"><ol [class.vertical]="orientation() === 'vertical'">@for(step of steps();track step.id;let index=$index){<li><button type="button" [disabled]="disabled() || index > current()" [attr.aria-current]="index === current() ? 'step' : null" [class.completed]="completed().includes(step.id)" [class.error]="errorStep() === index" (click)="selected.emit(index)"><span class="step-number" aria-hidden="true">{{ completed().includes(step.id) ? '✓' : index + 1 }}</span><span>{{ step.title }}<small>{{ errorStep() === index ? 'Needs attention' : completed().includes(step.id) ? 'Completed' : step.optional ? 'Optional' : index === current() ? 'Current' : 'Pending' }}</small></span></button></li>}</ol></nav>`, styles: `ol { display:flex; gap:8px; padding:0; margin:0 0 16px; list-style:none; overflow-x:auto; }li { flex:1; min-width:140px; }button { width:100%; display:flex; align-items:center; gap:8px; text-align:left; padding:12px; color:var(--iam-text); background:var(--iam-surface); border:1px solid var(--iam-border); border-radius:var(--iam-radius-md); min-height:56px; }button[aria-current] { border-color:var(--iam-accent); color:var(--iam-accent); }.step-number { border:1px solid var(--iam-control-border); border-radius:50%; width:26px; height:26px; flex-shrink:0; display:grid; place-items:center; }small { display:block; color:var(--iam-text-secondary); }.completed .step-number { background:var(--iam-success-fill); color:var(--iam-success-text); }.error { border-color:var(--iam-icon-danger); }.vertical { flex-direction:column; }.vertical li { flex:auto; }@media(max-width:767px){ol { flex-direction:column; }li { min-width:0; }}`, changeDetection: ChangeDetectionStrategy.OnPush })
 export class SmartStepper {
     readonly steps = input.required<readonly WizardStep[]>();

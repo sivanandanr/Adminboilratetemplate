@@ -5,6 +5,7 @@ import { timer } from 'rxjs';
 import { AUTH_CONFIG } from './auth.config';
 import { AUTH_CLOCK } from './auth.models';
 import { AuthFacade } from './auth.facade';
+import { BlockUiService } from '../feedback/block-ui.service';
 import { SessionChannel } from './session-channel';
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +13,7 @@ export class SessionService {
   private readonly auth = inject(AuthFacade);
   private readonly config = inject(AUTH_CONFIG);
   private readonly clock = inject(AUTH_CLOCK);
+  private readonly blockUi = inject(BlockUiService);
   private readonly channel = inject(SessionChannel);
   private readonly document = inject(DOCUMENT);
   private readonly destroyRef = inject(DestroyRef);
@@ -73,6 +75,13 @@ export class SessionService {
     const session = this.auth.session();
     if (!session || !this.auth.isAuthenticated()) return;
     if (this.activeUser !== session.user.id) { this.activeUser = session.user.id; this.lastActivity = this.clock(); }
+    // Foreground server work counts as activity; server expiry remains the security control.
+    if (this.blockUi.visible()) {
+      this.lastActivity = this.clock();
+      if (this.clock() - this.lastBroadcast >= 1000) {
+        this.lastBroadcast = this.clock(); this.channel.send({ type: 'activity', at: this.clock() });
+      }
+    }
     const idleRemaining = this.lastActivity + this.config.idleTimeoutMs - this.clock();
     const absoluteRemaining = session.expiresAt - this.auth.serverNow();
     const remainingMs = Math.min(idleRemaining, absoluteRemaining);

@@ -26,4 +26,9 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
+  it('mounts one foreground progress dialog and one background task panel', () => {
+    const fixture = TestBed.createComponent(App); fixture.detectChanges(); const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('smart-block-ui').length).toBe(1); expect(host.querySelectorAll('smart-background-tasks').length).toBe(1);
+    expect(host.querySelector('smart-route-progress')).toBeNull();
+  });
 });

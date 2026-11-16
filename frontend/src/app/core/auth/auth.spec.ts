@@ -1,3 +1,6 @@
+import { FormControl } from '@angular/forms';
+import { DirtyFormsService } from '../feedback/dirty-forms.service';
+import { DialogService } from '../feedback/dialog.service';
 import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree, provideRouter } from '@angular/router';
@@ -51,6 +54,12 @@ describe('AuthFacade and guards', () => {
     provider = jasmine.createSpyObj<AuthProvider>('AuthProvider', ['session', 'login', 'logout', 'renew', 'updateProfile', 'clearLocalSession']);
     provider.session.and.returnValue(of(testSession())); provider.logout.and.returnValue(of(undefined));
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection(), provideRouter([{ path: 'login', component: EmptyPage }, { path: 'access-denied', component: EmptyPage }]), { provide: AUTH_PROVIDER, useValue: provider }, { provide: SessionChannel, useValue: { messages: of(), send: jasmine.createSpy('broadcast') } }] });
+  });
+  it('allows Keep editing to cancel voluntary logout, but security expiry bypasses dirty warnings', async () => {
+    const auth=TestBed.inject(AuthFacade); await auth.initialize(); const registry=TestBed.inject(DirtyFormsService); const control=new FormControl('edit'); registry.track(control); control.markAsDirty();
+    const leaving=auth.logout(); const dialogs=TestBed.inject(DialogService); expect(dialogs.requests().length).toBe(1); dialogs.settle(dialogs.requests()[0].id,{confirmed:false}); await leaving;
+    expect(auth.isAuthenticated()).toBeTrue(); expect(provider.logout).not.toHaveBeenCalled(); expect(registry.isDirty()).toBeTrue();
+    const secondAttempt=auth.logout(); expect(dialogs.requests().length).toBe(1); await auth.logout('expired'); await secondAttempt; expect(auth.isAuthenticated()).toBeFalse(); expect(registry.isDirty()).toBeFalse(); expect(dialogs.requests().length).toBe(0); expect(provider.logout).toHaveBeenCalledTimes(1);
   });
   it('clears state despite logout failure and ignores late session responses', async () => {
     const auth = TestBed.inject(AuthFacade); await auth.initialize();
